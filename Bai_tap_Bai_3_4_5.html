@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BÀI TẬP BÀI 3, 4, 5</title>
+<style>
+  :root{
+    --bg1:#0f2027;
+    --bg2:#203a43;
+    --bg3:#2c5364;
+    --accent:#38bdf8;
+    --accent2:#818cf8;
+    --green:#22c55e;
+    --red:#ef4444;
+    --card:#0f1b2b;
+    --text:#f1f5f9;
+    --muted:#94a3b8;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;width:100%;
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    color:var(--text);
+    overflow:hidden;
+    background:#05080b;
+  }
+  /* Khung sân khấu cố định 1280x720 (16:9), JS co giãn theo màn hình chiếu */
+  #stage{
+    position:fixed;
+    top:50%;left:50%;
+    width:1280px;height:720px;
+    transform-origin:center center;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    box-shadow:0 0 80px rgba(0,0,0,0.6);
+    overflow:hidden;
+  }
+  #app{
+    height:100%;width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  #fullscreen-btn{
+    position:absolute;
+    top:8px;right:18px;
+    z-index:999;
+    background:rgba(15,27,43,0.85);
+    border:1px solid rgba(255,255,255,0.25);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+    backdrop-filter:blur(6px);
+    transition:all .2s;
+  }
+  #fullscreen-btn:hover{
+    background:rgba(56,189,248,0.25);
+    border-color:var(--accent);
+  }
+  .header{
+    text-align:center;
+    margin-bottom:8px;
+  }
+  .header-banner{
+    position:relative;
+    width:1180px;
+    height:95px;
+    margin:0 auto 8px auto;
+    padding:0;
+    border-radius:26px;
+    overflow:hidden;
+    background:#102b34;
+    border:1px solid rgba(125,211,252,0.28);
+    box-shadow:0 10px 30px rgba(0,0,0,0.28);
+  }
+  .header-banner img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center center;
+  }
+  .quiz-title{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    padding:0 105px; text-align:center; white-space:nowrap; overflow:hidden;
+    font-size:22px; line-height:1.05; font-weight:900; letter-spacing:.35px;
+    color:#fff; text-shadow:0 2px 5px #001018, 0 0 10px rgba(0,0,0,.95);
+    background:linear-gradient(90deg,rgba(4,15,22,.12),rgba(4,15,22,.58),rgba(4,15,22,.12));
+  }
+  .deco{ position:absolute; pointer-events:none; }
+  .deco-school{
+    left:16px; top:50%; transform:translateY(-50%);
+    width:64px; height:64px; opacity:0.85;
+  }
+  .deco-molecule{
+    right:16px; top:50%; transform:translateY(-50%);
+    width:70px; height:70px; opacity:0.85;
+    animation:spin-slow 14s linear infinite;
+  }
+  .deco-snow{ left:88px; top:8px; width:26px; height:26px; opacity:0.7; }
+  .deco-thermo{ right:92px; top:6px; width:16px; height:34px; opacity:0.75; }
+  .deco-drops{ left:0; bottom:4px; width:100%; height:16px; opacity:0.55; }
+  @keyframes spin-slow{
+    from{ transform:translateY(-50%) rotate(0deg); }
+    to{ transform:translateY(-50%) rotate(360deg); }
+  }
+  @media (max-width:640px){
+    .deco-school,.deco-molecule{ width:44px; height:44px; }
+    .deco-snow,.deco-thermo{ display:none; }
+  }
+  .school-strip{
+    position:relative;
+    width:100%;
+    height:86px;
+    border-radius:18px 18px 0 0;
+    overflow:hidden;
+    margin:-22px -20px 14px -20px;
+    width:calc(100% + 40px);
+  }
+  .school-strip img{
+    width:100%;height:100%;object-fit:cover;
+    filter:brightness(0.62) saturate(1.05);
+  }
+  .school-strip::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(15,32,39,0.15) 0%, rgba(15,32,39,0.55) 65%, rgba(15,32,39,0.92) 100%);
+  }
+  .school-id{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .school-logo{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid rgba(255,255,255,0.55);
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    background:#fff;
+  }
+  .school-name{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    color:#e2e8f0;
+    text-transform:uppercase;
+  }
+  .fraction{
+    display:inline-grid !important;
+    grid-template-columns:max-content !important;
+    grid-template-rows:auto auto !important;
+    justify-items:center !important;
+    align-items:center !important;
+    vertical-align:middle;
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:fit-content !important;
+    margin:0 .16em;
+    font-size:.94em;
+    line-height:1.02;
+    white-space:nowrap;
+    flex:0 0 auto;
+  }
+  .fraction .numerator{
+    display:block !important;
+    justify-self:center !important;
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:fit-content !important;
+    box-sizing:content-box !important;
+    border-bottom:1px solid currentColor;
+    padding:0 .10em .05em;
+    white-space:nowrap;
+  }
+  .fraction .denominator{
+    display:block !important;
+    justify-self:center !important;
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:fit-content !important;
+    box-sizing:content-box !important;
+    padding:.05em .10em 0;
+    white-space:nowrap;
+  }
+  .question-text .fraction,.option-text .fraction,.explanation .fraction{
+    display:inline-grid !important;
+    width:fit-content !important;
+    max-width:fit-content !important;
+  }
+  .question-text .fraction .numerator,.question-text .fraction .denominator,
+  .option-text .fraction .numerator,.option-text .fraction .denominator,
+  .explanation .fraction .numerator,.explanation .fraction .denominator{
+    width:fit-content !important;
+    max-width:fit-content !important;
+  }
+  sup{font-size:.72em; vertical-align:super;}
+  sub{font-size:.72em; vertical-align:sub;}
+  .header h1{
+    font-size:26px;
+    margin:0 0 6px 0;
+    letter-spacing:1px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .progress-wrap{
+    width:1180px;
+    margin:0 auto 18px auto;
+  }
+  .progress-label{
+    display:flex;justify-content:space-between;
+    font-size:14px;color:var(--muted);margin-bottom:6px;
+  }
+  .progress-bar{
+    width:100%;height:10px;border-radius:6px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;border-radius:6px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    transition:width .35s ease;
+  }
+  .card{
+    width:1180px;
+    background:rgba(15,27,43,0.85);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:22px 30px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    position:relative;
+    backdrop-filter:blur(6px);
+    max-height:400px;
+    overflow-y:auto;
+  }
+  .qnum-row{
+    display:block;
+    position:relative;
+    margin-bottom:22px;
+  }
+  .qnum{
+    position:absolute;
+    left:0;
+    top:0;
+    display:inline-block;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0b1220;
+    font-weight:800;
+    padding:6px 18px;
+    border-radius:999px;
+    font-size:15px;
+    letter-spacing:1px;
+    white-space:nowrap;
+  }
+  /* Chỉ thụt dòng đầu để nhường chỗ cho nhãn câu; các dòng sau thẳng lề trái. */
+  .qtext{ text-indent:0; }
+  .timer-badge{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,0.08);
+    border:2px solid rgba(255,255,255,0.18);
+    border-radius:999px;
+    padding:6px 16px;
+    font-weight:800;
+    font-size:15px;
+    min-width:70px;
+    justify-content:center;
+    transition:all .2s;
+  }
+  .timer-badge .clock-icon{font-size:16px;}
+  .timer-badge.warn{
+    border-color:#facc15;
+    color:#facc15;
+    background:rgba(250,204,21,0.12);
+  }
+  .timer-badge.danger{
+    border-color:var(--red);
+    color:var(--red);
+    background:rgba(239,68,68,0.15);
+    animation:pulse .6s infinite;
+  }
+  .timer-badge.stopped{
+    opacity:0.4;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+  }
+  .qtext{
+    font-size:24px;
+    line-height:1.35;
+    margin:0;
+    font-weight:600;
+    min-width:0;
+  }
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  @media (max-width:600px){
+    .options{grid-template-columns:1fr;}
+  }
+  .opt-btn{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    text-align:left;
+    background:rgba(255,255,255,0.06);
+    border:2px solid rgba(255,255,255,0.12);
+    color:var(--text);
+    padding:14px 16px;
+    border-radius:14px;
+    font-size:24px;
+    cursor:pointer;
+    transition:all .18s ease;
+    line-height:1.4;
+  }
+  .opt-btn:hover:not(.disabled){
+    border-color:var(--accent);
+    background:rgba(56,189,248,0.12);
+    transform:translateY(-2px);
+  }
+  .opt-btn .badge{
+    flex:0 0 auto;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;
+    font-size:21px;
+  }
+  .opt-btn.correct{
+    background:rgba(34,197,94,0.22);
+    border-color:var(--green);
+  }
+  .opt-btn.correct .badge{background:var(--green);color:#052e12;}
+  .opt-btn.wrong{
+    background:rgba(239,68,68,0.22);
+    border-color:var(--red);
+    animation:shake .35s;
+  }
+  .opt-btn.wrong .badge{background:var(--red);color:#3f0505;}
+  .opt-btn.disabled{cursor:default;opacity:0.55;}
+  .opt-btn.disabled.correct,.opt-btn.disabled.wrong{opacity:1;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
+  .feedback{
+    min-height:30px;
+    font-weight:800;
+    font-size:16px;
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .feedback.correct{color:var(--green);}
+  .feedback.wrong{color:var(--red);}
+  .answer-box{
+    display:none;
+    background:rgba(255,255,255,0.05);
+    border-left:4px solid var(--red);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-top:6px;
+  }
+  .answer-box.show{display:block;}
+  .answer-box .ans-line{
+    display:inline;
+    font-weight:800;
+    margin-right:10px;
+  }
+  .answer-box .ans-line span{color:var(--red);}
+  .answer-box .exp-line{
+    display:inline;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+  }
+  .nav-row{
+    width:1180px;
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    margin-top:20px;
+    gap:12px;
+  }
+  .nav-row #prev-btn{justify-self:start;}
+  .nav-row #timer-badge{justify-self:center;}
+  .nav-row #next-btn{justify-self:end;}
+  .nav-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--text);
+    padding:12px 22px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s;
+  }
+  .nav-btn:hover:not(:disabled){
+    background:rgba(56,189,248,0.2);
+    border-color:var(--accent);
+  }
+  .nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .nav-btn.primary{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0b1220;
+    border:none;
+  }
+  .molecule-deco{
+    position:fixed;
+    pointer-events:none;
+    opacity:0.15;
+    z-index:0;
+  }
+  #finish-screen{
+    display:none;
+    text-align:center;
+  }
+  #finish-screen h2{
+    font-size:30px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:10px;
+  }
+  #finish-screen .score{
+    font-size:52px;
+    font-weight:900;
+    margin:16px 0;
+  }
+  #finish-screen p{color:var(--muted);font-size:16px;}
+  .restart-btn{
+    margin-top:20px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0b1220;border:none;
+    padding:14px 30px;border-radius:12px;
+    font-weight:800;font-size:16px;cursor:pointer;
+  }
+/* Phương án dự phòng khi trình duyệt không hỗ trợ Fullscreen API */
+body.fallback-fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  overflow:auto !important;
+  z-index:999999 !important;
+  background:#fff !important;
+}
+
+/* FULLSCREEN FALLBACK - dùng được khi mở trực tiếp file HTML */
+body.fallback-fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  z-index:2147483647 !important;
+  background:#0f2027 !important;
+}
+body.fallback-fullscreen #stage{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  min-height:0 !important;
+  transform:none !important;
+  overflow:hidden !important;
+}
+
+/* ===== KHÓA/XOAY NGANG TRÊN ĐIỆN THOẠI ===== */
+/* Ưu tiên Screen Orientation API; CSS là phương án dự phòng khi trình duyệt không hỗ trợ. */
+@media screen and (max-width:900px) and (orientation:portrait){
+  body.force-landscape #stage{
+    width:1280px !important;
+    height:720px !important;
+    top:50% !important;
+    left:50% !important;
+    transform-origin:center center !important;
+  }
+}
+
+</style>
+</head>
+<body>
+<div id="stage">
+<div id="app">
+  <div class="header-banner">
+
+    <div class="quiz-title">BÀI TẬP BÀI 3, 4, 5</div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label">
+      <span id="progress-text">CÂU 01 / 32</span>
+      <span id="score-text" style="color:white;">Điểm: 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="card" id="quiz-card">
+    <div class="qnum-row">
+      <div class="qnum" id="qnum">CÂU 01</div>
+      <div class="qtext" id="qtext"></div>
+    </div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="answer-box" id="answer-box">
+      <div class="ans-line">ĐÁP ÁN ĐÚNG: <span id="ans-letter"></span></div>
+      <div class="exp-line" id="exp-text"></div>
+    </div>
+  </div>
+
+  <div class="card" id="finish-screen">
+    <h2>HOÀN THÀNH!</h2>
+    <div class="score" id="final-score">Điểm: 0</div>
+    <button class="restart-btn" onclick="restartQuiz()" style="color: #fff;">LÀM LẠI TỪ ĐẦU</button>
+  </div>
+
+  <div class="nav-row" id="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="prevSlide()">← CÂU TRƯỚC</button>
+    <div class="timer-badge" id="timer-badge"><span class="clock-icon">⏱</span><span id="timer-text">30</span></div>
+    <button class="nav-btn primary" id="next-btn" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+  </div>
+<button id="fullscreen-btn" onclick="toggleFullscreen()"><span id="fs-icon">⛶</span><span id="fs-label">Toàn màn hình</span></button>
+</div>
+
+<script>
+  function isPortrait(){
+    return window.innerHeight > window.innerWidth;
+  }
+
+  function resizeStage(){
+    const stage = document.getElementById('stage');
+    if(!stage) return;
+
+    const forceLandscape = document.body.classList.contains('force-landscape');
+    let scale;
+
+    // Khi điện thoại chưa tự xoay được, tính theo kích thước sau khi
+    // xoay 90 độ để giao diện 16:9 vẫn vừa màn hình.
+    if(forceLandscape && isPortrait() && window.innerWidth <= 900){
+      scale = Math.min(window.innerWidth/720, window.innerHeight/1280);
+    }else{
+      scale = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    }
+
+    stage.style.transform =
+      'translate(-50%,-50%) scale(' + scale + ')' +
+      (forceLandscape && isPortrait() && window.innerWidth <= 900
+        ? ' rotate(90deg)' : '');
+  }
+
+  function lockLandscape(){
+    document.body.classList.add('force-landscape');
+    resizeStage();
+
+    try{
+      if(screen && screen.orientation && screen.orientation.lock){
+        const p = screen.orientation.lock('landscape');
+        if(p && typeof p.catch === 'function'){
+          p.catch(function(){ resizeStage(); });
+        }
+      }
+    }catch(e){}
+  }
+
+  function unlockLandscape(){
+    document.body.classList.remove('force-landscape');
+
+    try{
+      if(screen && screen.orientation && screen.orientation.unlock){
+        screen.orientation.unlock();
+      }
+    }catch(e){}
+
+    resizeStage();
+  }
+
+  function toggleFullscreen(){
+    const body = document.body;
+    const doc = document;
+    const root = document.documentElement;
+
+    // Đang ở chế độ dự phòng: thóat.
+    if(body.classList.contains('fallback-fullscreen')){
+      body.classList.remove('fallback-fullscreen');
+      unlockLandscape();
+      updateFullscreenButton();
+      return;
+    }
+
+    // Đang ở fullscreen thật: thóat.
+    if(doc.fullscreenElement || doc.webkitFullscreenElement){
+      try{
+        if(doc.exitFullscreen){
+          const p = doc.exitFullscreen();
+          if(p && typeof p.then === 'function'){
+            p.then(function(){
+              unlockLandscape();
+              updateFullscreenButton();
+            }).catch(function(){
+              unlockLandscape();
+              updateFullscreenButton();
+            });
+          }else{
+            unlockLandscape();
+            updateFullscreenButton();
+          }
+        }else if(doc.webkitExitFullscreen){
+          doc.webkitExitFullscreen();
+          unlockLandscape();
+          updateFullscreenButton();
+        }
+      }catch(e){
+        unlockLandscape();
+        updateFullscreenButton();
+      }
+      return;
+    }
+
+    // Bật chế độ yêu cầu xoay ngang ngay từ lúc người dùng bấm nút.
+    lockLandscape();
+
+    // Thử fullscreen thật.
+    try{
+      if(root.requestFullscreen){
+        const p = root.requestFullscreen();
+        if(p && typeof p.then === 'function'){
+          p.then(function(){
+            lockLandscape();
+            updateFullscreenButton();
+          }).catch(function(){
+            // Nếu Fullscreen API bị chặn, vẫn giữ phương án xoay ngang bằng CSS.
+            body.classList.add('fallback-fullscreen');
+            lockLandscape();
+            updateFullscreenButton();
+          });
+        }else{
+          lockLandscape();
+          updateFullscreenButton();
+        }
+        return;
+      }
+
+      if(root.webkitRequestFullscreen){
+        root.webkitRequestFullscreen();
+        lockLandscape();
+        updateFullscreenButton();
+        return;
+      }
+    }catch(e){}
+
+    // Chế độ dự phòng khi trình duyệt không hỗ trợ Fullscreen API.
+    body.classList.add('fallback-fullscreen');
+    lockLandscape();
+    updateFullscreenButton();
+  }
+
+  function updateFullscreenButton(){
+    const icon = document.getElementById('fs-icon');
+    const label = document.getElementById('fs-label');
+    const active = !!(document.fullscreenElement ||
+                      document.webkitFullscreenElement ||
+                      document.body.classList.contains('fallback-fullscreen'));
+
+    if(icon) icon.textContent = active ? '⤓' : '⛶';
+    if(label) label.textContent = active ? 'Thóat toàn màn hình' : 'Toàn màn hình';
+  }
+
+  window.addEventListener('resize', resizeStage);
+  document.addEventListener('fullscreenchange', ()=>{
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      unlockLandscape();
+    }else{
+      lockLandscape();
+    }
+    resizeStage();
+    updateFullscreenButton();
+  });
+  document.addEventListener('webkitfullscreenchange', ()=>{
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      unlockLandscape();
+    }else{
+      lockLandscape();
+    }
+    resizeStage();
+    updateFullscreenButton();
+  });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(resizeStage, 120);
+  });
+  resizeStage();
+</script>
+
+<script>
+const questions = [
+{
+  "q":"Trong dao động điều hoà thì li độ, vận tốc và gia tốc là những đại lượng biến đổi theo hàm sin hoặc cosin theo thời gian và",
+  "o":["cùng biên độ.","cùng pha ban đầu.","cùng chu kì.","cùng pha dao động."],
+  "a":2,
+  "e":"Li độ, vận tốc và gia tốc trong dao động điều hòa đều biến thiên tuần hoàn theo thời gian với cùng chu kì."
+},
+{
+  "q":"Phương trình li độ của một vật dao động điều hoà có dạng x = A cos(ωt + φ). Phương trình gia tốc của vật là",
+  "o":["a = Aω² cos(ωt + φ).","a = Aω² sin(ωt + φ).","a = −Aω² cos(ωt + φ).","a = −Aω² sin(ωt + φ)."],
+  "a":2,
+  "e":"Gia tốc trong dao động điều hòa thỏa mãn a = −ω²x. Thay x = A cos(ωt + φ), được a = −Aω² cos(ωt + φ)."
+},
+{
+  "q":"Trong dao động điều hoà, li độ biến đổi",
+  "o":["cùng pha với vận tốc.","trễ pha π/2 so với vận tốc.","vuông pha với gia tốc.","cùng pha với gia tốc."],
+  "a":1,
+  "e":"Li độ và vận tốc lệch pha nhau π/2; li độ trễ pha π/2 so với vận tốc."
+},
+{
+  "q":"Trong dao động điều hoà, gia tốc biến đổi",
+  "o":["cùng pha với vận tốc.","sớm pha π/2 so với vận tốc.","ngược pha với vận tốc.","trễ pha π/2 so với vận tốc."],
+  "a":1,
+  "e":"Gia tốc và vận tốc lệch pha nhau π/2; gia tốc sớm pha π/2 so với vận tốc."
+},
+{
+  "q":"Đối với dao động cơ điều hòa của một vật thì khi vật đi đến vị trí biên nó có",
+  "o":["tốc độ bằng không và độ lớn gia tốc cực đại.","tốc độ bằng không và độ lớn gia tốc bằng không.","tốc độ cực đại và độ lớn gia tốc cực đại.","tốc độ cực đại và độ lớn gia tốc bằng không."],
+  "a":0,
+  "e":"Ở vị trí biên, vật đổi chiều chuyển động nên tốc độ bằng 0; độ lớn gia tốc đạt cực đại vì độ lớn li độ cực đại."
+},
+{
+  "q":"Vận tốc và gia tốc của dao động điều hòa thỏa mãn mệnh đề nào sau đây?",
+  "o":["Ở vị trí biên thì vận tốc bằng không, gia tốc bằng không.","Ở vị trí biên thì vận tốc cực đại, gia tốc bằng không.","Ở vị trí cân bằng thì vận tốc cực đại, gia tốc cực đại.","Ở vị trí cân bằng thì tốc độ cực đại, gia tốc bằng không."],
+  "a":3,
+  "e":"Ở vị trí cân bằng, tốc độ của vật cực đại và li độ bằng 0 nên gia tốc a = −ω²x = 0."
+},
+{
+  "q":"Một vật dao động điều hòa đang chuyển động từ vị trí cân bằng đến vị trí biên âm thì",
+  "o":["vận tốc ngược chiều với gia tốc.","độ lớn vận tốc và gia tốc cùng tăng.","vận tốc và gia tốc cùng có giá trị âm.","độ lớn vận tốc và gia tốc cùng giảm."],
+  "a":0,
+  "e":"Khi vật đi từ vị trí cân bằng về biên âm, vận tốc hướng theo chiều âm còn gia tốc hướng về vị trí cân bằng, tức theo chiều dương; hai vectơ ngược chiều."
+},
+{
+  "q":"Cho một chất điểm dao động điều hòa với phương trình x = 3 cos(ωt − 5π/6) (cm). Pha ban đầu của vận tốc dao động nhận giá trị là",
+  "o":["−π/3 rad.","π/3 rad.","5π/6 rad.","−π/6 rad."],
+  "a":0,
+  "e":"Với x = A cos(ωt + φ), vận tốc có thể viết v = Aω cos(ωt + φ + π/2). Do đó pha ban đầu của vận tốc là −5π/6 + π/2 = −π/3 rad."
+},
+{
+  "q":"Một vật dao động điều hòa trên trục Ox quanh vị trí cân bằng O. Vectơ gia tốc của vật",
+  "o":["luôn hướng ra xa vị trí cân bằng.","có độ lớn tỉ lệ nghịch với độ lớn li độ của vật.","luôn hướng về vị trí cân bằng.","có độ lớn tỉ lệ thuận với độ lớn vận tốc của vật."],
+  "a":2,
+  "e":"Trong dao động điều hòa, a = −ω²x nên vectơ gia tốc luôn hướng về vị trí cân bằng."
+},
+{
+  "q":"Trong dao động điều hòa x = A cos(ωt + φ), tốc độ nhỏ nhất bằng",
+  "o":["0,5ωA.","ωA.","0.","−ωA."],
+  "a":2,
+  "e":"Tốc độ bằng 0 tại hai vị trí biên, vì vậy tốc độ nhỏ nhất bằng 0."
+},
+{
+  "q":"Gia tốc của một vật dao động điều hòa x = A cos(ωt + φ) được tính bởi công thức",
+  "o":["a = −ω²x.","a = ω²x.","a = −ωx².","a = −ωx."],
+  "a":0,
+  "e":"Gia tốc trong dao động điều hòa được xác định bởi hệ thức a = −ω²x."
+},
+{
+  "q":"Một vật dao động điều hòa với biên độ 4 cm, tần số góc của dao động là 2π rad/s thì tốc độ cực đại của vật là",
+  "o":["8π cm/s.","4π cm/s.","π/2 cm/s.","2/π cm/s."],
+  "a":0,
+  "e":"Tốc độ cực đại vₘₐₓ = ωA = 2π × 4 = 8π cm/s."
+},
+{
+  "q":"Khi một vật dao động điều hòa, chuyển động của vật từ vị trí cân bằng ra biên là chuyển động",
+  "o":["nhanh dần.","nhanh dần đều.","chậm dần.","chậm dần đều."],
+  "a":2,
+  "e":"Khi đi từ vị trí cân bằng ra biên, tốc độ giảm từ giá trị cực đại xuống 0 nên vật chuyển động chậm dần; gia tốc không không đổi nên không phải chậm dần đều."
+},
+{
+  "q":"Phương trình li độ của một vật dao động điều hoà có dạng x = A cos(ωt + φ). Vận tốc cực đại của vật là",
+  "o":["vₘₐₓ = ωA.","vₘₐₓ = ω²A.","vₘₐₓ = 2ωA.","vₘₐₓ = ω²A²."],
+  "a":0,
+  "e":"Từ phương trình vận tốc v = −ωA sin(ωt + φ), suy ra độ lớn vận tốc cực đại là vₘₐₓ = ωA."
+},
+{
+  "q":"Phát biểu nào sau đây là sai khi nói về dao động điều hoà?",
+  "o":["Gia tốc sớm pha π so với li độ.","Vận tốc và gia tốc luôn ngược pha nhau.","Vận tốc luôn trễ pha π/2 so với gia tốc.","Vận tốc luôn sớm pha π/2 so với li độ."],
+  "a":1,
+  "e":"Vận tốc và gia tốc lệch pha nhau π/2, không ngược pha nhau. Vì vậy phát biểu cho rằng chúng luôn ngược pha là sai."
+},
+{
+  "q":"Phương trình li độ của một vật dao động điều hoà có dạng x = A cos(ωt + φ). Phương trình vận tốc của vật là",
+  "o":["v = ωA cos(ωt + φ).","v = ωA sin(ωt + φ).","v = −ωA cos(ωt + φ).","v = −ωA sin(ωt + φ)."],
+  "a":3,
+  "e":"Vận tốc là đạo hàm của li độ theo thời gian: v = −ωA sin(ωt + φ)."
+},
+{
+  "q":"Một vật dao động điều hòa với biên độ A và tốc độ cực đại vₘₐₓ. Tần số góc của vật dao động là",
+  "o":["ω = vₘₐₓ/(2πA).","ω = vₘₐₓ/(πA).","ω = vₘₐₓ/A.","ω = vₘₐₓ/(2A)."],
+  "a":2,
+  "e":"Vì vₘₐₓ = ωA nên ω = vₘₐₓ/A."
+},
+{
+  "q":"Một vật dao động điều hòa với biên độ A và tốc độ cực đại vₘₐₓ. Chu kì dao động của vật là",
+  "o":["T = vₘₐₓ/A.","T = A/vₘₐₓ.","T = vₘₐₓ/(2πA).","T = 2πA/vₘₐₓ."],
+  "a":3,
+  "e":"Ta có vₘₐₓ = ωA và T = 2π/ω, suy ra T = 2πA/vₘₐₓ."
+},
+{
+  "q":"Một chất điểm dao động điều hòa trên trục Ox. Vectơ gia tốc của chất điểm có",
+  "o":["độ lớn cực đại ở vị trí biên, chiều luôn hướng ra biên.","độ lớn cực tiểu khi qua vị trí cân bằng luôn cùng chiều với vectơ vận tốc.","độ lớn không đổi, chiều luôn hướng về vị trí cân bằng.","độ lớn tỉ lệ với độ lớn của li độ, chiều luôn hướng về vị trí cân bằng."],
+  "a":3,
+  "e":"Theo a = −ω²x, độ lớn gia tốc tỉ lệ với độ lớn li độ và vectơ gia tốc luôn hướng về vị trí cân bằng."
+},
+{
+  "q":"Phương trình x = A cos(ωt − π/3) biểu diễn dao động điều hòa của một chất điểm. Gốc thời gian đã được chọn khi",
+  "o":["li độ x = A/2 và chất điểm đang chuyển động hướng về vị trí cân bằng.","li độ x = A/2 và chất điểm đang chuyển động hướng ra xa vị trí cân bằng.","li độ x = −A/2 và chất điểm đang chuyển động hướng về vị trí cân bằng.","li độ x = −A/2 và chất điểm đang chuyển động hướng ra xa vị trí cân bằng."],
+  "a":1,
+  "e":"Tại t = 0, x = A cos(−π/3) = A/2. Đồng thời v = −ωA sin(−π/3) > 0; vật ở phía dương và chuyển động theo chiều dương nên đi ra xa vị trí cân bằng."
+},
+{
+  "q":"Hai dao động điều hòa cùng phương có phương trình x₁ = A cos(ωt + π/3) và x₂ = A cos(ωt − 2π/3) là hai dao động",
+  "o":["cùng pha.","lệch pha π/3.","lệch pha π/2.","ngược pha."],
+  "a":3,
+  "e":"Độ lệch pha là Δφ = π/3 − (−2π/3) = π. Hai dao động ngược pha."
+},
+{
+  "q":"Một vật dao động điều hòa có phương trình x = A cos(ωt + φ). Gọi v và a lần lượt là vận tốc và gia tốc của vật. Hệ thức đúng là",
+  "o":["v²/ω⁴ + a²/ω² = A².","v²/ω² + a²/ω² = A².","v²/ω² + a²/ω⁴ = A².","ω²/v² + a²/ω⁴ = A²."],
+  "a":2,
+  "e":"Từ x² + v²/ω² = A² và a = −ω²x, suy ra x² = a²/ω⁴. Do đó v²/ω² + a²/ω⁴ = A²."
+},
+{
+  "q":"Vật dao động điều hòa theo trục Ox. Phát biểu nào sau đây đúng?",
+  "o":["Quỹ đạo chuyển động của vật là một đoạn thẳng.","Lực kéo về tác dụng vào vật không đổi.","Quỹ đạo chuyển động của vật là một đường hình cos.","Li độ của vật tỉ lệ với thời gian dao động."],
+  "a":0,
+  "e":"Vật dao động trên trục Ox giữa hai vị trí biên nên quỹ đạo là một đoạn thẳng."
+},
+{
+  "q":"Phương trình li độ của một vật dao động điều hoà có dạng x = 10 cos(10t − π/2), với x đo bằng cm và t đo bằng s. Phương trình vận tốc của vật là",
+  "o":["v = 100 cos(10t) (cm/s).","v = 100 cos(10t + π) (cm/s).","v = 100 sin(10t) (cm/s).","v = 100 sin(10t + π) (cm/s)."],
+  "a":0,
+  "e":"Lấy đạo hàm x theo thời gian: v = −100 sin(10t − π/2) = 100 cos(10t) cm/s."
+},
+{
+  "q":"Trong dao động điều hoà của con lắc lò xo, cơ năng của nó bằng",
+  "o":["tổng động năng và thế năng của vật khi qua một vị trí bất kì.","thế năng của vật nặng khi qua vị trí cân bằng.","động năng của vật nặng khi qua vị trí biên.","động năng tại vị trí vật có li độ bất kì."],
+  "a":0,
+  "e":"Cơ năng của con lắc lò xo bằng tổng động năng và thế năng tại mọi vị trí; trong quá trình dao động, cơ năng được bảo toàn."
+},
+{
+  "q":"Một vật có khối lượng m đang dao động điều hòa. Khi vật có vận tốc v thì động năng của nó là",
+  "o":["mv².","½mv².","vm².","½vm²."],
+  "a":1,
+  "e":"Động năng của vật chuyển động với tốc độ v được xác định bởi Wđ = ½mv²."
+},
+{
+  "q":"Cơ năng của một vật dao động điều hoà tỉ lệ thuận với",
+  "o":["bình phương biên độ dao động.","li độ của dao động.","biên độ dao động.","chu kì dao động."],
+  "a":0,
+  "e":"Cơ năng dao động điều hòa W = ½mω²A² nên tỉ lệ thuận với bình phương biên độ A² khi m và ω không đổi."
+},
+{
+  "q":"Trong dao động điều hoà, khi vật đi từ vị trí cân bằng ra biên thì",
+  "o":["động năng tăng, thế năng giảm.","động năng giảm, thế năng tăng.","cả động năng và thế năng tăng.","cả động năng và thế năng giảm."],
+  "a":1,
+  "e":"Khi đi từ vị trí cân bằng ra biên, tốc độ giảm nên động năng giảm; độ lớn li độ tăng nên thế năng tăng."
+},
+{
+  "q":"Tại vị trí cân bằng của dao động điều hoà, nếu chọn mốc thế năng tại vị trí cân bằng thì",
+  "o":["thế năng cực đại.","thế năng bằng cơ năng.","thế năng bằng 0.","thế năng không xác định."],
+  "a":2,
+  "e":"Khi chọn vị trí cân bằng làm mốc thế năng, thế năng tại vị trí cân bằng bằng 0."
+},
+{
+  "q":"Một vật dao động điều hoà có m = 0,20 kg, ω = 5 rad/s, A = 0,10 m. Cơ năng của vật là",
+  "o":["0,005 J.","0,010 J.","0,025 J.","0,050 J."],
+  "a":2,
+  "e":"Cơ năng W = ½mω²A² = ½ × 0,20 × 5² × 0,10² = 0,025 J."
+},
+{
+  "q":"Một vật có khối lượng m dao động điều hòa có phương trình x = A cos(ωt + φ). Động năng cực đại của vật bằng",
+  "o":["½mω²A.","½ω²A².","½mω²A⁴.","½mω²A²."],
+  "a":3,
+  "e":"Động năng cực đại bằng cơ năng của dao động điều hòa: Wđ,max = ½mω²A²."
+},
+{
+  "q":"Trong dao động điều hoà, gia tốc biến đổi",
+  "o":["cùng pha với vận tốc.","sớm pha π/4 so với vận tốc.","ngược pha với li độ.","trễ pha π/2 so với vận tốc."],
+  "a":2,
+  "e":"Từ a = −ω²x, gia tốc và li độ ngược pha nhau."
+}
+];
+
+function escapeHTML(value){
+  return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function fracHTML(top,bottom){
+  // Inline styles force intrinsic sizing so the fraction bar cannot stretch to the question-line width.
+  return '<span class="fraction" style="display:inline-grid;grid-template-columns:max-content;grid-template-rows:auto auto;justify-items:center;align-items:center;width:fit-content;min-width:0;max-width:fit-content;vertical-align:middle;white-space:nowrap;line-height:1.02;margin:0 .16em;font-size:.94em;flex:0 0 auto;">'
+    +'<span class="numerator" style="display:block;width:fit-content;min-width:0;max-width:fit-content;justify-self:center;box-sizing:content-box;border-bottom:1px solid currentColor;padding:0 .10em .05em;white-space:nowrap;">'+top+'</span>'
+    +'<span class="denominator" style="display:block;width:fit-content;min-width:0;max-width:fit-content;justify-self:center;box-sizing:content-box;padding:.05em .10em 0;white-space:nowrap;">'+bottom+'</span>'
+    +'</span>';
+}
+function formatPhysicsText(value){
+  let t=escapeHTML(value);
+  t=t.replace(/\boC\b/g,'°C')
+     .replace(/\b(\d+(?:,\d+)?)\.(10)([356])\b/g,'$1 × 10<sup>$3</sup>')
+     .replace(/\b(\d+(?:,\d+)?)\.105\b/g,'$1 × 10<sup>5</sup>')
+     .replace(/\b(\d+(?:,\d+)?)\.106\b/g,'$1 × 10<sup>6</sup>')
+     .replace(/x₁/g,'x<sub>1</sub>').replace(/x₂/g,'x<sub>2</sub>')
+     .replace(/cFe\b/g,'c<sub>Fe</sub>').replace(/cCu\b/g,'c<sub>Cu</sub>').replace(/cPb\b/g,'c<sub>Pb</sub>')
+     .replace(/QFe\b/g,'Q<sub>Fe</sub>').replace(/QCu\b/g,'Q<sub>Cu</sub>').replace(/QPb\b/g,'Q<sub>Pb</sub>')
+     .replace(/J\/kg·K/g,'J/(kg·K)').replace(/J\/kg\.K/g,'J/(kg·K)');
+
+  // Các phân số toán học hiển thị bằng tử số / mẫu số xếp chồng; xử lý mẫu dài trước.
+  t=t.replace(/½/g,fracHTML('1','2'));
+  const fractions = [
+
+
+
+
+    [/v²\/ω⁴/g,fracHTML('v²','ω⁴')],
+    [/v²\/ω²/g,fracHTML('v²','ω²')],
+    [/a²\/ω⁴/g,fracHTML('a²','ω⁴')],
+    [/a²\/ω²/g,fracHTML('a²','ω²')],
+    [/ω²\/v²/g,fracHTML('ω²','v²')],
+    [/vₘₐₓ\/\(2πA\)/g,fracHTML('vₘₐₓ','2πA')],
+    [/vₘₐₓ\/\(πA\)/g,fracHTML('vₘₐₓ','πA')],
+    [/vₘₐₓ\/\(2A\)/g,fracHTML('vₘₐₓ','2A')],
+    [/2πA\/vₘₐₓ/g,fracHTML('2πA','vₘₐₓ')],
+    [/vₘₐₓ\/A/g,fracHTML('vₘₐₓ','A')],
+    [/A\/vₘₐₓ/g,fracHTML('A','vₘₐₓ')],
+    [/Q\/\(mΔT\)/g,fracHTML('Q','mΔT')],
+    [/Q\/\(mc\)/g,fracHTML('Q','mc')],
+    [/Q\/\(2m\)/g,fracHTML('Q','2m')],
+    [/Q\/0,4/g,fracHTML('Q','0,4')],
+    [/Q\/m/g,fracHTML('Q','m')],
+    [/Q\/λ/g,fracHTML('Q','λ')],
+    [/m\/Q/g,fracHTML('m','Q')],
+    [/2Q\/m/g,fracHTML('2Q','m')]
+  ];
+  fractions.forEach(([pattern,replacement])=>{ t=t.replace(pattern,replacement); });
+  return t;
+}
+function parseNumericOption(value){
+  const raw=String(value).trim();
+  // Kiểm tra số có dấu chấm phân tách hàng nghìn trước, tránh đọc nhầm thành phần thập phân.
+  const grouped= /^[+-]?\d+(?:,\d+)?\.10\d(?:\s|$)/.test(raw) ? null : raw.match(/^([+-]?\d{1,3}(?:\.\d{3})+)(?:,(\d+))?\s*(.*?)\s*$/);
+  if(grouped){
+    const numberText=grouped[1].replace(/\./g,'')+(grouped[2]!==undefined?'.'+grouped[2]:'');
+    const suffix=grouped[3].trim().replace(/\.$/,'').trim();
+    return {coefficient:Number(numberText), exponent:0, suffix, hasExponent:false, hasGrouped:true};
+  }
+  const match=raw.match(/^([+-]?\d+(?:,\d+)?)(?:\s*(?:(?:×|x)\s*10\s*(?:\^\s*([+-]?\d+)|([⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+))|\.\s*10\s*(\d)))?\s*(.*?)\s*$/);
+  if(match){
+    let exponent=0;
+    if(match[2]!==undefined) exponent=parseInt(match[2],10);
+    else if(match[3]!==undefined){
+      const supers={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-'};
+      exponent=parseInt(Array.from(match[3]).map(ch=>supers[ch]||ch).join(''),10);
+    } else if(match[4]!==undefined) exponent=parseInt(match[4],10);
+    const suffix=match[5].trim().replace(/\.$/,'').trim();
+    return {coefficient:Number(match[1].replace(',','.')), exponent, suffix, hasExponent:match[2]!==undefined||match[3]!==undefined||match[4]!==undefined, hasGrouped:false};
+  }
+  return null;
+}
+function formatAnswerOption(value, allOptions){
+  const parsed=allOptions.map(parseNumericOption);
+  if(parsed.some(item=>item===null)) return formatPhysicsText(value);
+  const suffixKey=item=>item.suffix.replace(/\s+/g,' ').toLowerCase();
+  if(!parsed.every(item=>suffixKey(item)===suffixKey(parsed[0]))) return formatPhysicsText(value);
+  // Khi một phương án đã dùng ký pháp lũy thừa, chuẩn hóa cả bốn phương án về cùng dạng.
+  if(!parsed.some(item=>item.hasExponent || item.hasGrouped)) return formatPhysicsText(value);
+  const item=parseNumericOption(value);
+  if(!item) return formatPhysicsText(value);
+  let number=item.coefficient*Math.pow(10,item.exponent);
+  if(number===0) return formatPhysicsText(value);
+  let exponent=Math.floor(Math.log10(Math.abs(number)));
+  let mantissa=number/Math.pow(10,exponent);
+  let mantissaText=Number(mantissa.toPrecision(8)).toString().replace('.',',');
+  if(mantissaText==='10'||mantissaText==='-10'){
+    mantissa/=10; exponent+=1; mantissaText=Number(mantissa.toPrecision(8)).toString().replace('.',',');
+  }
+  const suffix=item.suffix ? ' '+formatPhysicsText(item.suffix) : '';
+  return escapeHTML(mantissaText)+' × 10<sup>'+exponent+'</sup>'+suffix;
+}
+
+const letters = ["A","B","C","D"];
+
+/* ---------- Xáo trộn thứ tự câu hỏi và thứ tự đáp án mỗi lượt làm bài ---------- */
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function fmtNum(n, digits){
+  const d = digits === undefined ? 2 : digits;
+  return Number(n.toFixed(d)).toString().replace('.', ',');
+}
+const previousVariantKeys = {};
+function replaceCorrect(q, answerText, explanation){
+  const previousCorrect = q.o[q.a];
+  q.o[q.a] = answerText;
+  // Nếu đáp án mới trùng một phương án nhiễu cũ, thay phương án trùng bằng đáp án cũ.
+  for(let i=0;i<q.o.length;i++){
+    if(i!==q.a && q.o[i]===answerText) q.o[i]=previousCorrect;
+  }
+  q.e = explanation;
+}
+function applyCalculationVariant(q, index){
+  const choose = arr => {
+    const previous = previousVariantKeys[index];
+    let choices = previous === undefined ? arr : arr.filter(v => JSON.stringify(v) !== previous);
+    if(!choices.length) choices = arr;
+    const selected = choices[Math.floor(Math.random()*choices.length)];
+    previousVariantKeys[index] = JSON.stringify(selected);
+    return selected;
+  };
+
+  if(index===7){ // Pha ban đầu của vận tốc: thay pha ban đầu của li độ
+    const v=choose([
+      {phase:'− π/6', value:'π/3', opts:['−π/3 rad.','π/3 rad.','π/6 rad.','−π/6 rad.'],a:1},
+      {phase:'+ π/6', value:'2π/3', opts:['2π/3 rad.','−π/3 rad.','π/3 rad.','π/6 rad.'],a:0},
+      {phase:'− π/3', value:'π/6', opts:['−π/6 rad.','π/6 rad.','−π/3 rad.','π/3 rad.'],a:1},
+      {phase:'− 5π/6', value:'−π/3', opts:['−π/3 rad.','π/3 rad.','5π/6 rad.','−π/6 rad.'],a:0}
+    ]);
+    q.q='Cho một chất điểm dao động điều hòa với phương trình x = 3 cos(ωt '+v.phase+') (cm). Pha ban đầu của vận tốc dao động nhận giá trị là';
+    q.o=v.opts.slice(); q.a=v.a;
+    q.e='Với x = A cos(ωt + φ), pha ban đầu của vận tốc là φ + π/2. Do đó pha ban đầu của vận tốc bằng '+v.value+' rad.';
+  } else if(index===11){ // Tốc độ cực đại: đổi biên độ, giữ tần số góc
+    const A = choose([3,5,6]);
+    const fmtPi = n => (n===1?'π':String(n)+'π');
+    q.q='Một vật dao động điều hòa với biên độ '+A+' cm, tần số góc của dao động là 2π rad/s thì tốc độ cực đại của vật là';
+    q.o=[fmtPi(2*A)+' cm/s.',fmtPi(A)+' cm/s.','π/2 cm/s.','2/π cm/s.'];
+    q.a=0;
+    q.e='Tốc độ cực đại vₘₐₓ = ωA = 2π × '+A+' = '+fmtPi(2*A)+' cm/s.';
+  } else if(index===19){ // Lời dẫn theo ảnh: thay pha ban đầu, tính li độ lúc t = 0
+    const v=choose([
+      {phase:'− π/3', x:'A/2', options:['li độ x = A/2 và chất điểm đang chuyển động hướng về vị trí cân bằng.','li độ x = A/2 và chất điểm đang chuyển động hướng ra xa vị trí cân bằng.','li độ x = −A/2 và chất điểm đang chuyển động hướng về vị trí cân bằng.','li độ x = −A/2 và chất điểm đang chuyển động hướng ra xa vị trí cân bằng.'],a:1},
+      {phase:'− 2π/3', x:'−A/2', options:['li độ x = A/2 và chất điểm đang chuyển động hướng về vị trí cân bằng.','li độ x = A/2 và chất điểm đang chuyển động hướng ra xa vị trí cân bằng.','li độ x = −A/2 và chất điểm đang chuyển động hướng về vị trí cân bằng.','li độ x = −A/2 và chất điểm đang chuyển động hướng ra xa vị trí cân bằng.'],a:2}
+    ]);
+    q.q='Phương trình x = A cos(ωt '+v.phase+') biểu diễn dao động điều hòa của một chất điểm. Gốc thời gian đã được chọn khi';
+    q.o=v.options.slice(); q.a=v.a;
+    q.e='Tại t = 0, x = A cos('+v.phase+') = '+v.x+'. Vận tốc v = −ωA sin(ωt '+v.phase+'); xét dấu vận tốc cho biết vật đang chuyển động '+(v.a===1?'ra xa':'về')+' vị trí cân bằng.';
+  } else if(index===23){ // Phương trình vận tốc: thay biên độ, tính lại hệ số
+    const A=choose([8,10,12]);
+    const omega=10, vmax=A*omega;
+    q.q='Phương trình li độ của một vật dao động điều hoà có dạng x = '+A+' cos(10t − π/2), với x đo bằng cm và t đo bằng s. Phương trình vận tốc của vật là';
+    q.o=[
+      'v = '+vmax+' cos(10t) (cm/s).',
+      'v = '+vmax+' cos(10t + π) (cm/s).',
+      'v = '+vmax+' sin(10t) (cm/s).',
+      'v = '+vmax+' sin(10t + π) (cm/s).'
+    ];
+    q.a=0;
+    q.e='Lấy đạo hàm li độ theo thời gian: v = −'+vmax+' sin(10t − π/2) = '+vmax+' cos(10t) cm/s.';
+  } else if(index===29){ // Cơ năng: thay đổi một dữ kiện, tính lại kết quả
+    const v=choose([
+      {m:0.1,w:5,A:0.1},
+      {m:0.3,w:5,A:0.1},
+      {m:0.2,w:4,A:0.1},
+      {m:0.2,w:5,A:0.2}
+    ]);
+    const E=0.5*v.m*v.w*v.w*v.A*v.A;
+    const fmt = n => Number(n.toPrecision(5)).toString().replace('.',',');
+    q.q='Một vật dao động điều hoà có m = '+fmt(v.m)+' kg, ω = '+fmt(v.w)+' rad/s, A = '+fmt(v.A)+' m. Cơ năng của vật là';
+    q.o=[fmt(E/5)+' J.',fmt(E/2)+' J.',fmt(E)+' J.',fmt(2*E)+' J.'];
+    q.a=2;
+    q.e='Cơ năng W = ½mω²A² = ½ × '+fmt(v.m)+' × '+fmt(v.w)+'² × '+fmt(v.A)+'² = '+fmt(E)+' J.';
+  }
+  return q;
+}
+function buildShuffledQuestions(){
+  const attemptQuestions = questions.map((original, index)=>applyCalculationVariant(Object.assign({}, original, {o: original.o.slice()}), index));
+  const shuffledOrder = shuffleArray(attemptQuestions);
+  return shuffledOrder.map(q => {
+    const optionOrder = shuffleArray([0,1,2,3]); // vị trí gốc của từng phương án sau khi xáo
+    const newOptions = optionOrder.map(origIdx => q.o[origIdx]);
+    const newCorrect = optionOrder.indexOf(q.a);
+    return { q: q.q, o: newOptions, a: newCorrect, e: q.e, sourceLabel: q.sourceLabel || "" };
+  });
+}
+let activeQuestions = buildShuffledQuestions();
+
+let current = 0;
+let answered = new Array(activeQuestions.length).fill(false);
+let correctCount = 0;
+const TIME_LIMIT = 30;
+let timeLeft = TIME_LIMIT;
+let timerInterval = null;
+
+/* ---------- Âm thanh (tổng hợp trực tiếp, không cần file, chạy offline) ---------- */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  }
+  if(audioCtx.state === "suspended"){ audioCtx.resume(); }
+  return audioCtx;
+}
+function playTone(freq, duration, type, vol, delay){
+  try{
+    const ctx = getAudioCtx();
+    const startAt = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, startAt);
+    gain.gain.setValueAtTime(vol||0.3, startAt);
+    gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(startAt);
+    osc.stop(startAt + duration + 0.02);
+  }catch(e){ /* trình duyệt chặn audio trước tương tác - bỏ qua an toàn */ }
+}
+function playCorrectSound(){
+  playTone(784, 0.13, "sine", 0.28, 0);
+  playTone(988, 0.13, "sine", 0.28, 0.11);
+  playTone(1318, 0.22, "sine", 0.3, 0.22);
+}
+function playWrongSound(){
+  playTone(220, 0.28, "sawtooth", 0.22, 0);
+  playTone(160, 0.32, "sawtooth", 0.2, 0.1);
+}
+function playTimeUpSound(){
+  playTone(300, 0.15, "square", 0.2, 0);
+  playTone(220, 0.15, "square", 0.2, 0.16);
+  playTone(140, 0.3, "square", 0.22, 0.32);
+}
+
+/* ---------- Đồng hồ đếm ngược 10 giây mỗi câu ---------- */
+const timerBadgeEl = document.getElementById("timer-badge");
+const timerTextEl = document.getElementById("timer-text");
+
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+}
+function updateTimerDisplay(){
+  timerTextEl.textContent = timeLeft;
+  timerBadgeEl.classList.remove("warn","danger","stopped");
+  if(timeLeft<=3 && timeLeft>0){ timerBadgeEl.classList.add("danger"); }
+  else if(timeLeft<=6){ timerBadgeEl.classList.add("warn"); }
+}
+function startTimer(){
+  stopTimer();
+  timeLeft = TIME_LIMIT;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft<=0){
+      timeLeft = 0;
+      updateTimerDisplay();
+      stopTimer();
+      handleTimeUp();
+    } else {
+      updateTimerDisplay();
+    }
+  },1000);
+}
+function freezeTimerDisplay(){
+  stopTimer();
+  timerBadgeEl.classList.add("stopped");
+}
+function handleTimeUp(){
+  if(answered[current]) return;
+  playTimeUpSound();
+  const q = activeQuestions[current];
+  const btns = optionsEl.querySelectorAll(".opt-btn");
+  btns.forEach(b=>b.classList.add("disabled"));
+  feedbackEl.textContent = "⏰ HẾT GIỜ!";
+  feedbackEl.className = "feedback wrong";
+  answered[current] = true;
+  revealAnswer(true);
+  timerBadgeEl.classList.add("stopped");
+
+  // Hết thời gian dù chưa chọn đáp án vẫn được sang câu tiếp theo.
+  nextBtn.disabled = false;
+  nextBtn.style.opacity = "";
+  nextBtn.style.cursor = "pointer";
+  nextBtn.textContent = (current === activeQuestions.length - 1)
+    ? "HOÀN THÀNH"
+    : "CÂU TIẾP THEO →";
+}
+
+const qnumEl = document.getElementById("qnum");
+const qtextEl = document.getElementById("qtext");
+const optionsEl = document.getElementById("options");
+const feedbackEl = document.getElementById("feedback");
+const answerBoxEl = document.getElementById("answer-box");
+const ansLetterEl = document.getElementById("ans-letter");
+const expTextEl = document.getElementById("exp-text");
+const progressTextEl = document.getElementById("progress-text");
+const progressFillEl = document.getElementById("progress-fill");
+const scoreTextEl = document.getElementById("score-text");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+const quizCard = document.getElementById("quiz-card");
+const finishScreen = document.getElementById("finish-screen");
+const navRow = document.getElementById("nav-row");
+const progressWrap = document.getElementById("progress-wrap");
+
+function formatScore(count){
+  const score = count * 0.3125;
+  return score.toFixed(2).replace(".", ",");
+}
+
+function renderSlide(){
+  const q = activeQuestions[current];
+  qnumEl.textContent = "CÂU " + String(current+1).padStart(2,"0") + (q.sourceLabel ? " (" + q.sourceLabel + ")" : "");
+  qtextEl.innerHTML = formatPhysicsText(q.q);
+  // Nhường khoảng trống đúng bằng chiều rộng nhãn câu ở dòng đầu; dòng tiếp theo không thụt vào.
+  qtextEl.style.textIndent = (qnumEl.offsetWidth + 18) + "px";
+  progressTextEl.textContent = "CÂU " + String(current+1).padStart(2,"0") + " / " + activeQuestions.length;
+  progressFillEl.style.width = ((current+1)/activeQuestions.length*100) + "%";
+  scoreTextEl.textContent = "Điểm: " + formatScore(correctCount);
+
+  optionsEl.innerHTML = "";
+  q.o.forEach((optText, idx)=>{
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.innerHTML = '<span class="badge">'+letters[idx]+'</span><span>'+formatAnswerOption(optText,q.o)+'</span>'; 
+    btn.onclick = ()=>selectAnswer(idx);
+    optionsEl.appendChild(btn);
+  });
+
+  feedbackEl.textContent = "";
+  feedbackEl.className = "feedback";
+  answerBoxEl.className = "answer-box";
+
+  if(answered[current]){
+    revealAnswer(true);
+    freezeTimerDisplay();
+  } else {
+    startTimer();
+  }
+
+  prevBtn.disabled = (current===0);
+  nextBtn.textContent = (current===activeQuestions.length-1) ? "HOÀN THÀNH" : "CÂU TIẾP THEO →";
+  nextBtn.disabled = !answered[current];
+  nextBtn.style.opacity = answered[current] ? "" : "0.45";
+  nextBtn.style.cursor = answered[current] ? "pointer" : "not-allowed";
+}
+
+function selectAnswer(idx){
+  if(answered[current]) return; // đã trả lời rồi, khóa không cho chọn lại
+  const q = activeQuestions[current];
+  const btns = optionsEl.querySelectorAll(".opt-btn");
+  answered[current] = true;
+  freezeTimerDisplay();
+  if(idx === q.a){
+    playCorrectSound();
+    btns[idx].classList.add("correct");
+    feedbackEl.textContent = "✓ CHÍNH XÁC!";
+    feedbackEl.className = "feedback correct";
+    correctCount++;
+    scoreTextEl.textContent = "Điểm: " + formatScore(correctCount);
+  } else {
+    playWrongSound();
+    btns[idx].classList.add("wrong");
+    feedbackEl.textContent = "✗ CHƯA ĐÚNG!";
+    feedbackEl.className = "feedback wrong";
+  }
+  btns.forEach(b=>b.classList.add("disabled"));
+  revealAnswer(false);
+  nextBtn.disabled = false;
+  nextBtn.style.opacity = "";
+  nextBtn.style.cursor = "pointer";
+}
+
+function revealAnswer(instant){
+  const q = activeQuestions[current];
+  ansLetterEl.textContent = letters[q.a];
+  expTextEl.innerHTML = "GIẢI THÍCH: " + formatPhysicsText(q.e);
+  answerBoxEl.classList.add("show");
+  const btns = optionsEl.querySelectorAll(".opt-btn");
+  btns[q.a].classList.add("correct");
+  btns.forEach(b=>b.classList.add("disabled"));
+}
+
+function nextSlide(){
+  // Nếu hết giờ mà học sinh chưa chọn đáp án, vẫn được sang câu tiếp theo.
+  if(!answered[current] && timeLeft > 0){
+    alert("Hãy chọn một đáp án trước khi sang câu tiếp theo.");
+    return;
+  }
+  if(current === activeQuestions.length-1){
+    showFinish();
+    return;
+  }
+  current++;
+  renderSlide();
+}
+
+function prevSlide(){
+  if(current===0) return;
+  current--;
+  renderSlide();
+}
+
+function showFinish(){
+  stopTimer();
+  quizCard.style.display = "none";
+  navRow.style.display = "none";
+  progressWrap.style.display = "none";
+  finishScreen.style.display = "block";
+  document.getElementById("final-score").textContent = "Điểm: " + formatScore(correctCount);
+}
+
+function restartQuiz(){
+  stopTimer();
+  activeQuestions = buildShuffledQuestions();
+  current = 0;
+  answered = new Array(activeQuestions.length).fill(false);
+  correctCount = 0;
+  quizCard.style.display = "block";
+  navRow.style.display = "grid";
+  progressWrap.style.display = "block";
+  finishScreen.style.display = "none";
+  renderSlide();
+}
+
+renderSlide();
+function fitQuizTitle(){
+  const el=document.querySelector('.quiz-title'); if(!el) return;
+  let size=22; el.style.fontSize=size+'px';
+  while(el.scrollWidth>el.clientWidth && size>12){ size-=0.5; el.style.fontSize=size+'px'; }
+}
+fitQuizTitle(); window.addEventListener('resize',fitQuizTitle);
+
+</script>
+</body>
+</html>
