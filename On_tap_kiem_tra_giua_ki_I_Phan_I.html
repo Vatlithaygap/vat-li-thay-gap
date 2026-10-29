@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ÔN TẬP KIỂM TRA GIỮA KÌ I – PHẦN I</title>
+<style>
+  :root{
+    --bg1:#0f2027;
+    --bg2:#203a43;
+    --bg3:#2c5364;
+    --accent:#38bdf8;
+    --accent2:#818cf8;
+    --green:#22c55e;
+    --red:#ef4444;
+    --card:#0f1b2b;
+    --text:#f1f5f9;
+    --muted:#94a3b8;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;width:100%;
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    color:var(--text);
+    overflow:hidden;
+    background:#05080b;
+  }
+  /* Khung sân khấu cố định 1280x720 (16:9), JS co giãn theo màn hình chiếu */
+  #stage{
+    position:fixed;
+    top:50%;left:50%;
+    width:1280px;height:720px;
+    transform-origin:center center;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    box-shadow:0 0 80px rgba(0,0,0,0.6);
+    overflow:hidden;
+  }
+  #app{
+    height:100%;width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  #fullscreen-btn{
+    position:absolute;
+    top:8px;right:18px;
+    z-index:999;
+    background:rgba(15,27,43,0.85);
+    border:1px solid rgba(255,255,255,0.25);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+    backdrop-filter:blur(6px);
+    transition:all .2s;
+  }
+  #fullscreen-btn:hover{
+    background:rgba(56,189,248,0.25);
+    border-color:var(--accent);
+  }
+  .header{
+    text-align:center;
+    margin-bottom:8px;
+  }
+  .header-banner{
+    position:relative;
+    width:1180px;
+    height:95px;
+    margin:0 auto 8px auto;
+    padding:0;
+    border-radius:26px;
+    overflow:hidden;
+    background:#102b34;
+    border:1px solid rgba(125,211,252,0.28);
+    box-shadow:0 10px 30px rgba(0,0,0,0.28);
+  }
+  .header-banner img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center center;
+  }
+  .quiz-title{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    padding:0 105px; text-align:center; white-space:nowrap; overflow:hidden;
+    font-size:22px; line-height:1.05; font-weight:900; letter-spacing:.35px;
+    color:#fff; text-shadow:0 2px 5px #001018, 0 0 10px rgba(0,0,0,.95);
+    background:linear-gradient(90deg,rgba(4,15,22,.12),rgba(4,15,22,.58),rgba(4,15,22,.12));
+  }
+  .deco{ position:absolute; pointer-events:none; }
+  .deco-school{
+    left:16px; top:50%; transform:translateY(-50%);
+    width:64px; height:64px; opacity:0.85;
+  }
+  .deco-molecule{
+    right:16px; top:50%; transform:translateY(-50%);
+    width:70px; height:70px; opacity:0.85;
+    animation:spin-slow 14s linear infinite;
+  }
+  .deco-snow{ left:88px; top:8px; width:26px; height:26px; opacity:0.7; }
+  .deco-thermo{ right:92px; top:6px; width:16px; height:34px; opacity:0.75; }
+  .deco-drops{ left:0; bottom:4px; width:100%; height:16px; opacity:0.55; }
+  @keyframes spin-slow{
+    from{ transform:translateY(-50%) rotate(0deg); }
+    to{ transform:translateY(-50%) rotate(360deg); }
+  }
+  @media (max-width:640px){
+    .deco-school,.deco-molecule{ width:44px; height:44px; }
+    .deco-snow,.deco-thermo{ display:none; }
+  }
+  .school-strip{
+    position:relative;
+    width:100%;
+    height:86px;
+    border-radius:18px 18px 0 0;
+    overflow:hidden;
+    margin:-22px -20px 14px -20px;
+    width:calc(100% + 40px);
+  }
+  .school-strip img{
+    width:100%;height:100%;object-fit:cover;
+    filter:brightness(0.62) saturate(1.05);
+  }
+  .school-strip::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(15,32,39,0.15) 0%, rgba(15,32,39,0.55) 65%, rgba(15,32,39,0.92) 100%);
+  }
+  .school-id{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .school-logo{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid rgba(255,255,255,0.55);
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    background:#fff;
+  }
+  .school-name{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    color:#e2e8f0;
+    text-transform:uppercase;
+  }
+  .fraction{display:inline-flex; vertical-align:middle; flex-direction:column; text-align:center; line-height:1.02; margin:0 .12em; font-size:.94em;}
+  .fraction .numerator{border-bottom:1px solid currentColor; padding:0 .16em .05em;}
+  .fraction .denominator{padding:.05em .16em 0;}
+  sup{font-size:.72em; vertical-align:super;}
+  sub{font-size:.72em; vertical-align:sub;}
+  .header h1{
+    font-size:26px;
+    margin:0 0 6px 0;
+    letter-spacing:1px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .progress-wrap{
+    width:1180px;
+    margin:0 auto 18px auto;
+  }
+  .progress-label{
+    display:flex;justify-content:space-between;
+    font-size:14px;color:var(--muted);margin-bottom:6px;
+  }
+  .progress-bar{
+    width:100%;height:10px;border-radius:6px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;border-radius:6px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    transition:width .35s ease;
+  }
+  .card{
+    width:1180px;
+    background:rgba(15,27,43,0.85);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:22px 30px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    position:relative;
+    backdrop-filter:blur(6px);
+    max-height:400px;
+    overflow-y:auto;
+  }
+  .qnum-row{
+    display:block;
+    position:relative;
+    margin-bottom:22px;
+  }
+  .qnum{
+    position:absolute;
+    left:0;
+    top:0;
+    display:inline-block;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0b1220;
+    font-weight:800;
+    padding:6px 18px;
+    border-radius:999px;
+    font-size:15px;
+    letter-spacing:1px;
+    white-space:nowrap;
+  }
+  /* Chỉ thụt dòng đầu để nhường chỗ cho nhãn câu; các dòng sau thẳng lề trái. */
+  .qtext{ text-indent:0; }
+  .timer-badge{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,0.08);
+    border:2px solid rgba(255,255,255,0.18);
+    border-radius:999px;
+    padding:6px 16px;
+    font-weight:800;
+    font-size:15px;
+    min-width:70px;
+    justify-content:center;
+    transition:all .2s;
+  }
+  .timer-badge .clock-icon{font-size:16px;}
+  .timer-badge.warn{
+    border-color:#facc15;
+    color:#facc15;
+    background:rgba(250,204,21,0.12);
+  }
+  .timer-badge.danger{
+    border-color:var(--red);
+    color:var(--red);
+    background:rgba(239,68,68,0.15);
+    animation:pulse .6s infinite;
+  }
+  .timer-badge.stopped{
+    opacity:0.4;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+  }
+  .qtext{
+    font-size:24px;
+    line-height:1.35;
+    margin:0;
+    font-weight:600;
+    min-width:0;
+  }
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  @media (max-width:600px){
+    .options{grid-template-columns:1fr;}
+  }
+  .opt-btn{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    text-align:left;
+    background:rgba(255,255,255,0.06);
+    border:2px solid rgba(255,255,255,0.12);
+    color:var(--text);
+    padding:14px 16px;
+    border-radius:14px;
+    font-size:24px;
+    cursor:pointer;
+    transition:all .18s ease;
+    line-height:1.4;
+  }
+  .opt-btn:hover:not(.disabled){
+    border-color:var(--accent);
+    background:rgba(56,189,248,0.12);
+    transform:translateY(-2px);
+  }
+  .opt-btn .badge{
+    flex:0 0 auto;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;
+    font-size:21px;
+  }
+  .opt-btn.correct{
+    background:rgba(34,197,94,0.22);
+    border-color:var(--green);
+  }
+  .opt-btn.correct .badge{background:var(--green);color:#052e12;}
+  .opt-btn.wrong{
+    background:rgba(239,68,68,0.22);
+    border-color:var(--red);
+    animation:shake .35s;
+  }
+  .opt-btn.wrong .badge{background:var(--red);color:#3f0505;}
+  .opt-btn.disabled{cursor:default;opacity:0.55;}
+  .opt-btn.disabled.correct,.opt-btn.disabled.wrong{opacity:1;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
+  .feedback, .answer-box{display:none !important;}
+
+  .feedback{
+    min-height:30px;
+    font-weight:800;
+    font-size:16px;
+    margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .feedback.correct{color:var(--green);}
+  .feedback.wrong{color:var(--red);}
+  .answer-box{
+    display:none;
+    background:rgba(255,255,255,0.05);
+    border-left:4px solid var(--red);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-top:6px;
+  }
+  .answer-box.show{display:block;}
+  .answer-box .ans-line{
+    display:inline;
+    font-weight:800;
+    margin-right:10px;
+  }
+  .answer-box .ans-line span{color:var(--red);}
+  .answer-box .exp-line{
+    display:inline;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+  }
+  .nav-row{
+    width:1180px;
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    margin-top:20px;
+    gap:12px;
+  }
+  .nav-row #prev-btn{justify-self:start;}
+  .nav-row #timer-badge{justify-self:center;}
+  .nav-row #next-btn{justify-self:end;}
+  .nav-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--text);
+    padding:12px 22px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s;
+  }
+  .nav-btn:hover:not(:disabled){
+    background:rgba(56,189,248,0.2);
+    border-color:var(--accent);
+  }
+  .nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .nav-btn.primary{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0b1220;
+    border:none;
+  }
+  .molecule-deco{
+    position:fixed;
+    pointer-events:none;
+    opacity:0.15;
+    z-index:0;
+  }
+  #finish-screen{
+    display:none;
+    text-align:center;
+  }
+  #finish-screen h2{
+    font-size:30px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:10px;
+  }
+  #finish-screen .score{
+    font-size:52px;
+    font-weight:900;
+    margin:16px 0;
+  }
+  #finish-screen p{color:var(--muted);font-size:16px;}
+  .restart-btn{
+    margin-top:20px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0b1220;border:none;
+    padding:14px 30px;border-radius:12px;
+    font-weight:800;font-size:16px;cursor:pointer;
+  }
+/* Phương án dự phòng khi trình duyệt không hỗ trợ Fullscreen API */
+body.fallback-fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  overflow:auto !important;
+  z-index:999999 !important;
+  background:#fff !important;
+}
+
+/* FULLSCREEN FALLBACK - dùng được khi mở trực tiếp file HTML */
+body.fallback-fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  z-index:2147483647 !important;
+  background:#0f2027 !important;
+}
+body.fallback-fullscreen #stage{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  min-height:0 !important;
+  transform:none !important;
+  overflow:hidden !important;
+}
+
+/* ===== KHÓA/XOAY NGANG TRÊN ĐIỆN THOẠI ===== */
+/* Ưu tiên Screen Orientation API; CSS là phương án dự phòng khi trình duyệt không hỗ trợ. */
+@media screen and (max-width:900px) and (orientation:portrait){
+  body.force-landscape #stage{
+    width:1280px !important;
+    height:720px !important;
+    top:50% !important;
+    left:50% !important;
+    transform-origin:center center !important;
+  }
+}
+
+
+  .explanation, #explanation, .explanation-box, #explanation-box { display:none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+<div id="app">
+  <div class="header-banner">
+
+    <div class="quiz-title">ÔN TẬP KIỂM TRA GIỮA KÌ I – PHẦN I</div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label">
+      <span id="progress-text">CÂU 01 / 50</span>
+      <span id="score-text" style="color:white;">Điểm: 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="card" id="quiz-card">
+    <div class="qnum-row">
+      <div class="qnum" id="qnum">CÂU 01</div>
+      <div class="qtext" id="qtext"></div>
+    </div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="answer-box" id="answer-box">
+      <div class="ans-line">ĐÁP ÁN ĐÚNG: <span id="ans-letter"></span></div>
+    </div>
+  </div>
+
+  <div class="card" id="finish-screen">
+    <h2>HOÀN THÀNH!</h2>
+    <div class="score" id="final-score">Điểm: 0</div>
+    <button class="restart-btn" onclick="restartQuiz()" style="color: #fff;">LÀM LẠI TỪ ĐẦU</button>
+  </div>
+
+  <div class="nav-row" id="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="prevSlide()">← CÂU TRƯỚC</button>
+    <div class="timer-badge" id="timer-badge"><span class="clock-icon">⏱</span><span id="timer-text">30</span></div>
+    <button class="nav-btn primary" id="next-btn" onclick="nextSlide()">CÂU TIẾP THEO →</button>
+  </div>
+<button id="fullscreen-btn" onclick="toggleFullscreen()"><span id="fs-icon">⛶</span><span id="fs-label">Toàn màn hình</span></button>
+</div>
+
+<script>
+  function isPortrait(){
+    return window.innerHeight > window.innerWidth;
+  }
+
+  function resizeStage(){
+    const stage = document.getElementById('stage');
+    if(!stage) return;
+
+    const forceLandscape = document.body.classList.contains('force-landscape');
+    let scale;
+
+    // Khi điện thoại chưa tự xoay được, tính theo kích thước sau khi
+    // xoay 90 độ để giao diện 16:9 vẫn vừa màn hình.
+    if(forceLandscape && isPortrait() && window.innerWidth <= 900){
+      scale = Math.min(window.innerWidth/720, window.innerHeight/1280);
+    }else{
+      scale = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    }
+
+    stage.style.transform =
+      'translate(-50%,-50%) scale(' + scale + ')' +
+      (forceLandscape && isPortrait() && window.innerWidth <= 900
+        ? ' rotate(90deg)' : '');
+  }
+
+  function lockLandscape(){
+    document.body.classList.add('force-landscape');
+    resizeStage();
+
+    try{
+      if(screen && screen.orientation && screen.orientation.lock){
+        const p = screen.orientation.lock('landscape');
+        if(p && typeof p.catch === 'function'){
+          p.catch(function(){ resizeStage(); });
+        }
+      }
+    }catch(e){}
+  }
+
+  function unlockLandscape(){
+    document.body.classList.remove('force-landscape');
+
+    try{
+      if(screen && screen.orientation && screen.orientation.unlock){
+        screen.orientation.unlock();
+      }
+    }catch(e){}
+
+    resizeStage();
+  }
+
+  function toggleFullscreen(){
+    const body = document.body;
+    const doc = document;
+    const root = document.documentElement;
+
+    // Đang ở chế độ dự phòng: thóat.
+    if(body.classList.contains('fallback-fullscreen')){
+      body.classList.remove('fallback-fullscreen');
+      unlockLandscape();
+      updateFullscreenButton();
+      return;
+    }
+
+    // Đang ở fullscreen thật: thóat.
+    if(doc.fullscreenElement || doc.webkitFullscreenElement){
+      try{
+        if(doc.exitFullscreen){
+          const p = doc.exitFullscreen();
+          if(p && typeof p.then === 'function'){
+            p.then(function(){
+              unlockLandscape();
+              updateFullscreenButton();
+            }).catch(function(){
+              unlockLandscape();
+              updateFullscreenButton();
+            });
+          }else{
+            unlockLandscape();
+            updateFullscreenButton();
+          }
+        }else if(doc.webkitExitFullscreen){
+          doc.webkitExitFullscreen();
+          unlockLandscape();
+          updateFullscreenButton();
+        }
+      }catch(e){
+        unlockLandscape();
+        updateFullscreenButton();
+      }
+      return;
+    }
+
+    // Bật chế độ yêu cầu xoay ngang ngay từ lúc người dùng bấm nút.
+    lockLandscape();
+
+    // Thử fullscreen thật.
+    try{
+      if(root.requestFullscreen){
+        const p = root.requestFullscreen();
+        if(p && typeof p.then === 'function'){
+          p.then(function(){
+            lockLandscape();
+            updateFullscreenButton();
+          }).catch(function(){
+            // Nếu Fullscreen API bị chặn, vẫn giữ phương án xoay ngang bằng CSS.
+            body.classList.add('fallback-fullscreen');
+            lockLandscape();
+            updateFullscreenButton();
+          });
+        }else{
+          lockLandscape();
+          updateFullscreenButton();
+        }
+        return;
+      }
+
+      if(root.webkitRequestFullscreen){
+        root.webkitRequestFullscreen();
+        lockLandscape();
+        updateFullscreenButton();
+        return;
+      }
+    }catch(e){}
+
+    // Chế độ dự phòng khi trình duyệt không hỗ trợ Fullscreen API.
+    body.classList.add('fallback-fullscreen');
+    lockLandscape();
+    updateFullscreenButton();
+  }
+
+  function updateFullscreenButton(){
+    const icon = document.getElementById('fs-icon');
+    const label = document.getElementById('fs-label');
+    const active = !!(document.fullscreenElement ||
+                      document.webkitFullscreenElement ||
+                      document.body.classList.contains('fallback-fullscreen'));
+
+    if(icon) icon.textContent = active ? '⤓' : '⛶';
+    if(label) label.textContent = active ? 'Thóat toàn màn hình' : 'Toàn màn hình';
+  }
+
+  window.addEventListener('resize', resizeStage);
+  document.addEventListener('fullscreenchange', ()=>{
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      unlockLandscape();
+    }else{
+      lockLandscape();
+    }
+    resizeStage();
+    updateFullscreenButton();
+  });
+  document.addEventListener('webkitfullscreenchange', ()=>{
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      unlockLandscape();
+    }else{
+      lockLandscape();
+    }
+    resizeStage();
+    updateFullscreenButton();
+  });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(resizeStage, 120);
+  });
+  resizeStage();
+</script>
+
+<script>
+const questions = [
+  {
+    "q": "Ở thể nào các phân tử cấu tạo nên vật chất chỉ dao động quanh vị trí cân bằng cố định?",
+    "o": [
+      "Thể rắn.",
+      "Thể lỏng.",
+      "Thể khí.",
+      "Thể plasma."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Khi hai vật có nhiệt độ bằng nhau tiếp xúc nhau, thì",
+    "o": [
+      "có sự truyền nhiệt năng giữa chúng.",
+      "không có sự truyền nhiệt năng giữa chúng.",
+      "có sự truyền nhiệt lượng giữa chúng.",
+      "không có sự truyền nhiệt độ giữa chúng."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Trong suốt quá trình nóng chảy của chất rắn kết tinh, nhiệt lượng chất rắn nhận được dùng để",
+    "o": [
+      "phá vỡ liên kết giữa các phân tử mà không làm thay đổi nhiệt độ của nó.",
+      "phá vỡ liên kết giữa các phân tử và làm tăng nhiệt độ của nó.",
+      "giữ chặt liên kết giữa các phân tử và làm tăng nhiệt độ của nó.",
+      "giữ chặt liên kết giữa các phân tử và không làm thay đổi nhiệt độ của nó."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Sự bay hơi xảy ra ở nhiệt độ bất kì vì một số phân tử ở bề mặt chất lỏng",
+    "o": [
+      "chuyển động hỗn loạn không ngừng với tốc độ cao.",
+      "có động năng đủ lớn thắng lực tương tác giữa chúng.",
+      "nhẹ hơn không khí và tự động bay ra khỏi mặt thoáng.",
+      "có nhiệt độ thấp hơn nhiệt độ môi trường xung quanh."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Quá trình truyền nhiệt giữa hai vật xảy ra khi chúng",
+    "o": [
+      "không tiếp xúc nhau và chênh lệch nhiệt độ.",
+      "tiếp xúc nhau và có cùng nhiệt độ.",
+      "tiếp xúc nhau và chênh lệch nhiệt độ.",
+      "không tiếp xúc nhau và cùng nhiệt độ."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt độ không tuyệt đối là nhiệt độ mà tại đó động năng chuyển động nhiệt của các phân tử cấu tạo nên vật bằng không và thế năng của chúng đạt giá trị",
+    "o": [
+      "tối thiểu.",
+      "cực đại.",
+      "bằng không.",
+      "vô cực."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Khi năng lượng của các phân tử cấu tạo nên vật tăng thì nội năng của vật",
+    "o": [
+      "bằng 0.",
+      "không đổi.",
+      "tăng.",
+      "giảm."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Gọi ΔU là độ biến thiên nội năng của vật; A, Q là công và nhiệt lượng mà vật nhận được. Biểu thức nào sau đây mô tả định luật 1 của nhiệt động lực học?",
+    "o": [
+      "A = ∆U + 2Q.",
+      "Q = ∆U + 2A.",
+      "∆U = 2AQ.",
+      "∆U = A + Q."
+    ],
+    "a": 3,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt dung riêng của một chất là nhiệt lượng cần cung cấp để làm nhiệt độ của 1 kg chất đó",
+    "o": [
+      "tăng thêm 1 K.",
+      "tăng thêm 10 K.",
+      "giảm đi 10 K.",
+      "giảm đi 1 K."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Nội năng của vật phụ thuộc vào nhiệt độ của nó vì khi nhiệt độ tăng",
+    "o": [
+      "vật chuyển động nhanh hơn, động năng của nó giảm, nội năng của các phân tử cấu tạo nên vật giảm.",
+      "vật chuyển động chậm hơn, động năng của nó giảm, nội năng của các phân tử cấu tạo nên vật tăng.",
+      "các phân tử cấu tạo nên vật chuyển động nhanh hơn, động năng của chúng tăng, nội năng của vật tăng.",
+      "các phân tử cấu tạo nên vật chuyển động chậm hơn, động năng của chúng tăng, nội năng của vật giảm."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Khi quan sát các hạt bụi nhỏ bay lơ lửng trong luồng ánh sáng xuyên qua lỗ mái tôn của một ngôi nhà, ta thấy chúng chuyển động hỗn loạn không ngừng với quỹ đạo là những đường gấp khúc bất kì. Nguyên nhân của hiện tượng này là do",
+    "o": [
+      "các hạt bụi tự phát sinh chuyển động ngẫu nhiên trong không khí.",
+      "các phân tử không khí chuyển động hỗn loạn va chạm vào các hạt bụi.",
+      "giữa các hạt bụi trong không khí có lực tương tác tĩnh điện.",
+      "các hạt bụi chịu tác dụng của trọng lực không đồng đều nhau."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Vật chất ở thể khí thì",
+    "o": [
+      "các phân tử dao động quanh vị trí cân bằng xác định.",
+      "không có thể tích và hình dạng xác định.",
+      "rất khó nén.",
+      "có khoảng cách giữa các phân tử rất gần nhau."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt hóa hơi riêng là nhiệt lượng cần cung cấp cho chất lỏng để làm hóa hơi",
+    "o": [
+      "1 kg chất đó hoàn toàn ở nhiệt độ sôi.",
+      "1 kg chất đó hoàn toàn ở nhiệt nóng chảy.",
+      "khối chất đó hoàn toàn ở nhiệt độ nóng chảy.",
+      "khối chất đó hoàn toàn ở nhiệt bay hơi."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Để sản xuất phôi cơ khí bằng phương pháp gia công đúc, người ta rót kim loại lỏng vào khuôn đúc có hình dạng cố định. Trong quá trình hóa lỏng kim loại thì",
+    "o": [
+      "không cần cung cấp nhiệt lượng.",
+      "nhiệt độ kim loại tăng liên tục.",
+      "xảy ra sự ngưng tụ.",
+      "xảy ra sự nóng chảy."
+    ],
+    "a": 3,
+    "e": ""
+  },
+  {
+    "q": "Trong vòng tuần hoàn của nước, hiện tượng nào sau đây mô tả chính xác sự chuyển thể của nước từ thể lỏng sang thể khí?",
+    "o": [
+      "Hơi nước trong không khí ngưng tụ thành mây.",
+      "Nước trong đại dương đóng băng thành băng.",
+      "Nước từ sông hồ bốc hơi lên không khí nhờ ánh nắng Mặt Trời.",
+      "Nước từ mặt đất thấm qua các lớp đất đá xuống tầng ngầm."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Mỗi độ chia (1 OC) trong thang Celsius bằng 1/100 của khoảng cách giữa nhiệt độ tan chảy của nước tinh khiết đóng băng và nhiệt độ",
+    "o": [
+      "điểm mà nước tinh khiết tồn tại đồng thời ở thể rắn, lỏng và hơi (ở áp suất tiêu chuẩn).",
+      "đóng băng của nước tinh khiết (ở áp suất tiêu chuẩn).",
+      "sôi của nước tinh khiết (ở áp suất tiêu chuẩn).",
+      "bay hơi của nước tinh khiết (ở áp suất tiêu chuẩn)."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Khi cho hai vật chênh lệch nhiệt độ tiếp xúc nhau, năng lượng nhiệt luôn truyền từ vật có nhiệt độ cao hơn sang vật có",
+    "o": [
+      "nhiệt độ thấp hơn.",
+      "khối lượng nhỏ hơn.",
+      "hình dạng lớn hơn.",
+      "thể tích lớn hơn."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Chọn cụm từ thích hợp điền vào chỗ trống. Nhiệt dung riêng của một chất có giá trị bằng … để làm tăng nhiệt độ của 1 kg chất đó lên 1 K.",
+    "o": [
+      "công.",
+      "nhiệt lượng.",
+      "khối lượng.",
+      "nội năng."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Theo nhiệt động lực học, nội năng của một vật bằng tổng thế năng tương tác của các phân tử cấu tạo nên vật và",
+    "o": [
+      "nhiệt năng của các phân tử đó.",
+      "động năng của các phân tử đó.",
+      "năng lượng hóa học của các phân tử đó.",
+      "quang năng của các phân tử đó."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Xét một lượng khí chứa trong bình được đậy kín cố định. Hơ nóng bình trên ngọn lửa thì công A, nhiệt lượng Q, độ biến thiên nội năng ∆U của lượng khí đó được biểu diễn bởi hệ thức nào sau đây?",
+    "o": [
+      "∆U = A, A > 0.",
+      "∆U = Q, Q < 0.",
+      "∆U = Q, Q > 0.",
+      "∆U = A, A < 0."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Năm 1827, Robert Brown làm thí nghiệm để quan sát chuyển động nhiệt của các hạt phấn hoa trong một cốc nước bằng kính hiển vi. Phân tích kết quả thí nghiệm ta nhận biết được",
+    "o": [
+      "quỹ đạo các hạt phấn hoa có dạng đường thẳng.",
+      "các phân tử nước va chạm với các hạt phấn hoa từ nhiều phía.",
+      "nhiệt độ càng cao, các hạt phấn hoa chuyển động chậm lại.",
+      "các hạt phấn hoa dao động quanh vị trí cân bằng cố định."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Theo mô hình động học phân tử, ở thể rắn, các phân tử",
+    "o": [
+      "dao động quanh vị trí cân bằng không cố định.",
+      "sắp xếp không có trật tự.",
+      "chỉ dao động quanh vị trí cân bằng cố định.",
+      "chuyển động hỗn loạn."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Khi chất rắn kết tinh được nung nóng đến nhiệt độ nóng chảy, vì sao các phân tử có thể chuyển sang trạng thái lỏng?",
+    "o": [
+      "Vì các phân tử ngừng dao động quanh vị trí cân bằng.",
+      "Vì tốc độ chuyển động nhiệt của các phân tử tăng, độ trật tự bị phá vỡ.",
+      "Vì áp suất ngoài làm các phân tử giãn cách đột ngột.",
+      "Vì chất rắn tự tỏa nhiệt nên lực liên kết mất đi."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Vì sao các phân tử chất lỏng ở bề mặt có thể thoát khỏi chất lỏng để trở thành hơi?",
+    "o": [
+      "Vì chúng luôn dao động mạnh hơn các phân tử bên trong lòng chất lỏng.",
+      "Vì áp suất không khí làm tách các phân tử ra khỏi bề mặt.",
+      "Vì nhiệt độ mặt thoáng luôn cao hơn nhiệt độ của chất lỏng.",
+      "Vì chúng nhận đủ năng lượng khi va chạm và thắng lực liên kết."
+    ],
+    "a": 3,
+    "e": ""
+  },
+  {
+    "q": "Khi cho hai vật chênh lệch nhiệt độ tiếp xúc với nhau, năng lượng nhiệt luôn truyền từ vật có",
+    "o": [
+      "nhiệt độ cao hơn sang vật có nhiệt độ thấp hơn.",
+      "thể tích lớn hơn sang vật có thể tích nhỏ hơn.",
+      "thể tích nhỏ hơn sang vật có thể tích lớn hơn.",
+      "nhiệt độ thấp hơn sang vật có nhiệt độ cao hơn."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Phát biểu nào sau đây sai khi nói về thang nhiệt độ Celsius?",
+    "o": [
+      "Nhiệt độ trong thang Celsius được kí hiệu là t.",
+      "0 oC trong thang Celsius được gọi là nhiệt độ không tuyệt đối.",
+      "Giá trị của mỗi độ chia trong thang nhiệt độ Celsius là 1 oC.",
+      "Độ Celsius là đơn vị đo của nhiệt độ theo thang nhiệt độ Celsius."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Phát biểu nào sau đây đúng khi nói về mối liên hệ giữa nội năng của vật với năng lượng của các phân tử tạo nên vật?",
+    "o": [
+      "Khi năng lượng của các phân tử cấu tạo nên vật tăng thì nội năng của vật giảm.",
+      "Năng lượng của các phân tử cấu tạo nên vật không phụ thuộc vào nội năng của vật.",
+      "Khi năng lượng của các phân tử cấu tạo nên vật tăng thì nội năng của vật tăng.",
+      "Năng lượng của các phân tử cấu tạo nên vật phụ thuộc vào nhiệt lượng của vật."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Công thức định luật 1 của nhiệt động lực học là ΔU = A + Q, với A là kí hiệu công và Q là kí hiệu",
+    "o": [
+      "nhiệt lượng.",
+      "nhiệt dung riêng.",
+      "nhiệt nóng chảy riêng.",
+      "nhiệt độ."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Phát biểu nào sau đây đúng khi nói về nhiệt dung riêng của một chất?",
+    "o": [
+      "Nhiệt dung riêng của một chất cũng chính là nhiệt lượng làm nóng chất đó lên 1 K.",
+      "Nhiệt dung riêng của một chất có đơn vị giống đơn vị của nhiệt lượng.",
+      "Nhiệt dung riêng của một chất có giá trị bằng nhiệt lượng làm nóng 1 kg chất đó lên 1 K.",
+      "Số đo độ biến thiên nội năng trong quá trình truyền nhiệt gọi là nhiệt dung riêng."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Khi dùng bơm tay bơm không khí vào một quả bóng cao su, sau một lúc thân bơm trở nên nóng hơn ban đầu. Giải thích nào sau đây đúng theo định luật I nhiệt động lực học?",
+    "o": [
+      "Công người bơm thực hiện lên không khí làm nội năng của khí tăng lên.",
+      "Không khí bị nén nên nội năng tăng do nhận nhiệt từ môi trường ngoài.",
+      "Không khí nhận nhiệt từ tay người bơm nên nhiệt độ và nội năng đều giảm.",
+      "Không khí bị nén nên thể tích tăng, nội năng giảm."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Khi quan sát hiện tượng chuyển động Brown của các hạt phấn hoa rất nhỏ trong nước, kết luận nào sau đây phản ánh đúng bản chất của hiện tượng này?",
+    "o": [
+      "Các hạt phấn hoa chuyển động do chịu tác dụng tuần hoàn của trọng lực và lực đẩy của nước.",
+      "Các hạt phấn hoa chuyển động do nước tạo ra các dòng chảy nhỏ tác động thường xuyên lên chúng.",
+      "Các phân tử nước chuyển động hỗn loạn và va chạm liên tiếp vào hạt phấn hoa làm chúng chuyển động.",
+      "Các hạt phấn hoa chuyển động do không khí xung quanh truyền lực vào bề mặt tiếp xúc với nước."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Ở thể nào thì vật chất có thể tích riêng xác định và có hình dạng của phần bình chứa nó?",
+    "o": [
+      "Thể rắn.",
+      "Thể khí.",
+      "Thể lỏng.",
+      "Cả ba thể: rắn, lỏng, khí."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt lượng cần cung cấp cho 1 kg chất lỏng để nó hoá hơi hoàn toàn ở nhiệt độ sôi gọi là",
+    "o": [
+      "nhiệt nóng chảy.",
+      "nhiệt hóa hơi riêng.",
+      "nhiệt nóng chảy riêng.",
+      "nhiệt hóa hơi."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Vào mùa hè, nước trong hồ thường lạnh hơn không khí. Ví dụ, nước trong hồ có thể ở 22 °C, trong khi nhiệt độ không khí là 29 °C. Mặc dù không khí ấm hơn nhưng bạn vẫn cảm thấy lạnh khi ra khỏi nước. Nguyên nhân của hiện tượng này là do",
+    "o": [
+      "nước cách nhiệt tốt hơn không khí.",
+      "trong không khí có hơi nước.",
+      "nước trên da bạn đã bay hơi.",
+      "hơi nước trong không khí bị ngưng tụ trên da."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Hiện tượng nào sau đây liên quan đến sự nóng chảy?",
+    "o": [
+      "Hơi nước đọng lại trên thành nắp ấm khi được đun sôi.",
+      "Áo quần nhanh khô khi được đem phơi.",
+      "Quá trình hình thành mây và mưa.",
+      "Cục nước đá lấy từ tủ lạnh ra và để trên bàn."
+    ],
+    "a": 3,
+    "e": ""
+  },
+  {
+    "q": "Khi cho hai vật chênh lệch nhiệt độ tiếp xúc với nhau, năng lượng nhiệt luôn truyền từ vật có",
+    "o": [
+      "thể tích lớn hơn sang vật có thể tích nhỏ hơn.",
+      "nhiệt độ cao hơn sang vật có nhiệt độ thấp hơn.",
+      "khối lượng lớn hơn sang vật có khối lượng nhỏ hơn.",
+      "nhiệt độ thấp hơn sang vật có nhiệt độ cao hơn."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt dung riêng của nước là 4200 J/kg.K, có nghĩa là",
+    "o": [
+      "1 kg nước cần tỏa một nhiệt lượng 4200 J để làm cho nhiệt độ của nó tăng thêm 1 °C",
+      "1 kg nước cần thu một nhiệt lượng 4200 J/kg.K để làm cho nhiệt độ của nó tăng thêm 1 °C",
+      "1 lượng nước bất kì cần thu một nhiệt lượng 4200 J để làm cho nhiệt độ của nó tăng thêm 1 °C",
+      "1 kg nước cần thu một nhiệt lượng 4200 J để làm cho nhiệt độ của nó tăng thêm 1 °C"
+    ],
+    "a": 3,
+    "e": ""
+  },
+  {
+    "q": "Nội năng của vật",
+    "o": [
+      "không phụ thuộc vào nhiệt độ và thể tích của vật.",
+      "phụ thuộc vào nhiệt độ và thể tích của vật.",
+      "không phụ thuộc vào nhiệt độ của vật, chỉ phụ thuộc vào thể tích của vật.",
+      "không phụ thuộc vào thể tích của vật, chỉ phụ thuộc vào nhiệt độ của vật."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt dung riêng của một chất có giá trị bằng",
+    "o": [
+      "nhiệt lượng để làm giảm nhiệt độ của 1 kg chất đó xuống 1 K.",
+      "nhiệt lượng để làm tăng nhiệt độ của khối chất đó lên 1 K.",
+      "nhiệt lượng để làm tăng nhiệt độ của 1 kg chất đó lên 1 K.",
+      "nhiệt lượng để làm giảm nhiệt độ của khối chất đó xuống 1 K."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Khi nhiệt độ của một lượng khí chứa trong một bình kín, dãn nở nhiệt kém tăng thì nội năng của khí sẽ",
+    "o": [
+      "giảm xuống, vì các phân tử khí chuyển động chậm hơn làm động năng của các phân tử khí giảm.",
+      "tăng lên, vì các phân tử khí chuyển động chậm hơn làm động năng của các phân tử khí giảm.",
+      "tăng lên, vì các phân tử khí chuyển động nhanh hơn làm động năng của các phân tử khí tăng.",
+      "giảm xuống, vì các phân tử khí chuyển động nhanh hơn làm động năng của các phân tử khí tăng."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Các hạt phấn hoa trong nước chuyển động hỗn loạn không ngừng là do",
+    "o": [
+      "các phân tử khí va chạm với các hạt phấn hoa từ nhiều phía.",
+      "các phân tử nước va chạm với các hạt phấn hoa từ nhiều phía.",
+      "Các hạt phấn hoa tương tác với nhau và tự chuyển động.",
+      "các phân tử nước va chạm với các hạt phấn hoa chỉ từ một phía."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt lượng cần cung cấp cho vật từ khi bắt đầu nóng chảy tới khi vật nóng chảy hoàn toàn phụ thuộc vào yếu tố nào sau đây?",
+    "o": [
+      "Thể tích của vật.",
+      "Khối lượng của vật.",
+      "Độ tăng nhiệt độ của vật.",
+      "Bản chất của chất lỏng."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Trong thực hành đo nhiệt nóng chảy riêng của nước đá, cần đo trực tiếp những đại lượng nào sau đây để xác định nhiệt nóng chảy riêng của nước đá?",
+    "o": [
+      "Khối lượng nước đá, nhiệt độ nước đá, công suất của nguồn điện, nhiệt lượng.",
+      "Khối lượng nước ấm, nhiệt độ nước đá, công suất của nguồn điện, thời gian cung cấp điện.",
+      "Khối lượng nước đá, nhiệt độ nước đá, công suất của nguồn điện, thời gian cung cấp điện.",
+      "Cân điện tử, nhiệt độ nước đá, công suất của nguồn điện, thời gian cung cấp điện."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Theo mô hình động học phân tử, giải thích nào sau đây đúng khi nói về vật chất ở thể rắn? Do lực tương tác giữa các phân tử rất mạnh nên",
+    "o": [
+      "giữ cho các phân tử dao động quanh vị trí cân bằng cố định.",
+      "giữ cho các phân tử chuyển động quanh vị trí cân bằng không cố định.",
+      "khối chất rắn có thể tích xác định, có hình dạng không xác định.",
+      "tạo ra khoảng cách giữa các phân tử rất xa nhau."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt hoá hơi riêng của rượu là 8,57.105 J/kg, có nghĩa là",
+    "o": [
+      "1 kg rượu cần tỏa một lượng nhiệt 8,57.105 J để hoá hơi hoàn toàn ở nhiệt độ sôi.",
+      "1 kg rượu cần thu một lượng nhiệt 8,57.105 J để hoá hơi hoàn toàn ở nhiệt độ bất kì.",
+      "1 kg rượu cần thu một lượng nhiệt 8,57.105 J/kg để hoá hơi hoàn toàn ở nhiệt độ sôi.",
+      "1 kg rượu cần thu một lượng nhiệt 8,57.105 J để hoá hơi hoàn toàn ở nhiệt độ sôi."
+    ],
+    "a": 3,
+    "e": ""
+  },
+  {
+    "q": "Nhiệt độ mà tại đó tất cả các chất có động năng chuyển động nhiệt của các phân tử bằng 0 và thế năng của chúng là tối thiểu, gọi là",
+    "o": [
+      "nhiệt độ điểm ba của nước.",
+      "nhiệt độ không tuyệt đối.",
+      "nhiệt độ cao nhất mà các vật có thể có.",
+      "nhiệt độ tuyệt đối."
+    ],
+    "a": 1,
+    "e": ""
+  },
+  {
+    "q": "Trong hệ đơn vị SI, đơn vị của nhiệt dung riêng là",
+    "o": [
+      "J/kg.K.",
+      "J/°C",
+      "J/kg.",
+      "J/g.K."
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Trong thực hành đo nhiệt hóa hơi riêng của nước, dụng cụ thí nghiệm nào sau đây không sử dụng?",
+    "o": [
+      "Các viên nước đá nhỏ và nước lạnh.",
+      "Đồng hồ đo công suất nguồn điện và đo thời gian.",
+      "Nhiệt kế điện tử.",
+      "Nhiệt lượng kế bằng nhựa có vỏ xốp, kèm dây điện trở"
+    ],
+    "a": 0,
+    "e": ""
+  },
+  {
+    "q": "Phát biểu nào sau đây sai khi nói về cấu trúc của thể rắn?",
+    "o": [
+      "Các phân tử chỉ dao động quanh vị trí cân bằng cố định.",
+      "Khoảng cách giữa các phân tử rất gần nhau.",
+      "Vật rắn không có thể tích và hình dạng riêng xác định.",
+      "Các phân tử sắp xếp có trật tự."
+    ],
+    "a": 2,
+    "e": ""
+  },
+  {
+    "q": "Phát biểu nào sau đây đúng để giải thích nội năng của vật phụ thuộc vào nhiệt độ của vật?",
+    "o": [
+      "Khi nhiệt độ của vật thay đổi, khoảng cách giữa các phân tử thay đổi, thế năng phân tử thay đổi, vì vậy nội năng của vật thay đổi.",
+      "Khi nhiệt độ của vật thay đổi, khoảng cách giữa các phân tử thay đổi, động năng phân tử thay đổi, vì vậy nội năng của vật thay đổi.",
+      "Khi nhiệt độ của vật thay đổi, tốc độ chuyển động của các phân tử thay đổi, thế năng phân tử thay đổi, vì vậy nội năng của vật thay đổi.",
+      "Khi nhiệt độ của vật thay đổi, tốc độ chuyển động của các phân tử thay đổi, động năng phân tử thay đổi, vì vậy nội năng của vật thay đổi."
+    ],
+    "a": 3,
+    "e": ""
+  }
+];
+
+function escapeHTML(value){
+  return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function fracHTML(top,bottom){
+  return '<span class="fraction"><span class="numerator">'+top+'</span><span class="denominator">'+bottom+'</span></span>';
+}
+function formatPhysicsText(value){
+  let t=escapeHTML(value);
+  // Standardize temperature notation and powers used in the source questions.
+  t=t.replace(/\b([0-9]+)\s*[oOº°]\s*C\b/g,'$1 °C').replace(/\b[oOº]C\b/g,'°C').replace(/°\s+C\b/g,'°C');
+  t=t.replace(/\b(\d+(?:,\d+)?)\.10([356])\b/g,'$1 × 10<sup>$2</sup>');
+  t=t.replace(/\b(\d+(?:,\d+)?)\.10([56])\b/g,'$1 × 10<sup>$2</sup>');
+  t=t.replace(/cFe\b/g,'c<sub>Fe</sub>').replace(/cCu\b/g,'c<sub>Cu</sub>').replace(/cPb\b/g,'c<sub>Pb</sub>')
+     .replace(/QFe\b/g,'Q<sub>Fe</sub>').replace(/QCu\b/g,'Q<sub>Cu</sub>').replace(/QPb\b/g,'Q<sub>Pb</sub>').replace(/QAl\b/g,'Q<sub>Al</sub>').replace(/cM\b/g,'c<sub>M</sub>').replace(/cN\b/g,'c<sub>N</sub>').replace(/mM\b/g,'m<sub>M</sub>').replace(/mN\b/g,'m<sub>N</sub>')
+     .replace(/\bΔT\b/g,'ΔT').replace(/\bkg\.K\b/g,'kg·K')
+     .replace(/J\/kg·K/g,'J/(kg·K)').replace(/J\/kg\.K/g,'J/(kg·K)');
+  // Display mathematical quotients as stacked fractions, not slash expressions.
+  t=t.replace(/λ\s*=\s*Q\/m/g,'λ = '+fracHTML('Q','m'))
+     .replace(/L\s*=\s*Q\/m/g,'L = '+fracHTML('Q','m'))
+     .replace(/Q\/m/g,fracHTML('Q','m'))
+     .replace(/Q\/\(mΔT\)/g,fracHTML('Q','mΔT'))
+     .replace(/Q\/\(2m\)/g,fracHTML('Q','2m'))
+     .replace(/2Q\/m/g,fracHTML('2Q','m'))
+     .replace(/Q\/λ/g,fracHTML('Q','λ'))
+     .replace(/m\/Q/g,fracHTML('m','Q'))
+     .replace(/Q\/0,4/g,fracHTML('Q','0,4'))
+     .replace(/([0-9][0-9 ,]*(?: × 10(?:<sup>\d+<\/sup>|[⁰¹²³⁴⁵⁶⁷⁸⁹]+))?)\/\(([^()]+)\)/g,function(_,num,den){return fracHTML(num.trim(),den.trim());})
+     .replace(/\(([^()]+)\)\/([0-9][0-9 ,]*)/g,function(_,num,den){return fracHTML(num.trim(),den.trim());})
+     .replace(/Q\s*=\s*mcΔT/g,'Q = mcΔT')
+     .replace(/ΔT\s*=\s*Q\/\(mc\)/g,'ΔT = '+fracHTML('Q','mc'))
+     .replace(/c\s*=\s*Q\/\(mΔT\)/g,'c = '+fracHTML('Q','mΔT'));
+  return t;
+}
+function parseNumericOption(value){
+  const raw=String(value).trim();
+  // Kiểm tra số có dấu chấm phân tách hàng nghìn trước, tránh đọc nhầm thành phần thập phân.
+  const grouped= /^[+-]?\d+(?:,\d+)?\.10\d(?:\s|$)/.test(raw) ? null : raw.match(/^([+-]?\d{1,3}(?:\.\d{3})+)(?:,(\d+))?\s*(.*?)\s*$/);
+  if(grouped){
+    const numberText=grouped[1].replace(/\./g,'')+(grouped[2]!==undefined?'.'+grouped[2]:'');
+    const suffix=grouped[3].trim().replace(/\.$/,'').trim();
+    return {coefficient:Number(numberText), exponent:0, suffix, hasExponent:false, hasGrouped:true};
+  }
+  const match=raw.match(/^([+-]?\d+(?:,\d+)?)(?:\s*(?:(?:×|x)\s*10\s*(?:\^\s*([+-]?\d+)|([⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+))|\.\s*10\s*(\d)))?\s*(.*?)\s*$/);
+  if(match){
+    let exponent=0;
+    if(match[2]!==undefined) exponent=parseInt(match[2],10);
+    else if(match[3]!==undefined){
+      const supers={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-'};
+      exponent=parseInt(Array.from(match[3]).map(ch=>supers[ch]||ch).join(''),10);
+    } else if(match[4]!==undefined) exponent=parseInt(match[4],10);
+    const suffix=match[5].trim().replace(/\.$/,'').trim();
+    return {coefficient:Number(match[1].replace(',','.')), exponent, suffix, hasExponent:match[2]!==undefined||match[3]!==undefined||match[4]!==undefined, hasGrouped:false};
+  }
+  return null;
+}
+function formatAnswerOption(value, allOptions){
+  const parsed=allOptions.map(parseNumericOption);
+  if(parsed.some(item=>item===null)) return formatPhysicsText(value);
+  const suffixKey=item=>item.suffix.replace(/\s+/g,' ').toLowerCase();
+  if(!parsed.every(item=>suffixKey(item)===suffixKey(parsed[0]))) return formatPhysicsText(value);
+  // Khi một phương án đã dùng ký pháp lũy thừa, chuẩn hóa cả bốn phương án về cùng dạng.
+  if(!parsed.some(item=>item.hasExponent || item.hasGrouped)) return formatPhysicsText(value);
+  const item=parseNumericOption(value);
+  if(!item) return formatPhysicsText(value);
+  let number=item.coefficient*Math.pow(10,item.exponent);
+  if(number===0) return formatPhysicsText(value);
+  let exponent=Math.floor(Math.log10(Math.abs(number)));
+  let mantissa=number/Math.pow(10,exponent);
+  let mantissaText=Number(mantissa.toPrecision(8)).toString().replace('.',',');
+  if(mantissaText==='10'||mantissaText==='-10'){
+    mantissa/=10; exponent+=1; mantissaText=Number(mantissa.toPrecision(8)).toString().replace('.',',');
+  }
+  const suffix=item.suffix ? ' '+formatPhysicsText(item.suffix) : '';
+  return escapeHTML(mantissaText)+' × 10<sup>'+exponent+'</sup>'+suffix;
+}
+
+const letters = ["A","B","C","D"];
+
+/* ---------- Xáo trộn thứ tự câu hỏi và thứ tự đáp án mỗi lượt làm bài ---------- */
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function fmtNum(n, digits){
+  const d = digits === undefined ? 2 : digits;
+  return Number(n.toFixed(d)).toString().replace('.', ',');
+}
+function buildShuffledQuestions(){
+  const attemptQuestions = questions.map(original => Object.assign({}, original, {o: original.o.slice(), e: ""}));
+  const shuffledOrder = shuffleArray(attemptQuestions);
+  return shuffledOrder.map(q => {
+    const optionOrder = shuffleArray([0,1,2,3]); // vị trí gốc của từng phương án sau khi xáo
+    const newOptions = optionOrder.map(origIdx => q.o[origIdx]);
+    const newCorrect = optionOrder.indexOf(q.a);
+    return { q: q.q, o: newOptions, a: newCorrect, e: q.e, sourceLabel: q.sourceLabel || "" };
+  });
+}
+let activeQuestions = buildShuffledQuestions();
+
+let current = 0;
+let answered = new Array(activeQuestions.length).fill(false);
+let correctCount = 0;
+const TIME_LIMIT = 30;
+let timeLeft = TIME_LIMIT;
+let timerInterval = null;
+
+/* ---------- Âm thanh (tổng hợp trực tiếp, không cần file, chạy offline) ---------- */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  }
+  if(audioCtx.state === "suspended"){ audioCtx.resume(); }
+  return audioCtx;
+}
+function playTone(freq, duration, type, vol, delay){
+  try{
+    const ctx = getAudioCtx();
+    const startAt = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, startAt);
+    gain.gain.setValueAtTime(vol||0.3, startAt);
+    gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(startAt);
+    osc.stop(startAt + duration + 0.02);
+  }catch(e){ /* trình duyệt chặn audio trước tương tác - bỏ qua an toàn */ }
+}
+function playCorrectSound(){
+  playTone(784, 0.13, "sine", 0.28, 0);
+  playTone(988, 0.13, "sine", 0.28, 0.11);
+  playTone(1318, 0.22, "sine", 0.3, 0.22);
+}
+function playWrongSound(){
+  playTone(220, 0.28, "sawtooth", 0.22, 0);
+  playTone(160, 0.32, "sawtooth", 0.2, 0.1);
+}
+function playTimeUpSound(){
+  playTone(300, 0.15, "square", 0.2, 0);
+  playTone(220, 0.15, "square", 0.2, 0.16);
+  playTone(140, 0.3, "square", 0.22, 0.32);
+}
+
+/* ---------- Đồng hồ đếm ngược 20 giây mỗi câu ---------- */
+const timerBadgeEl = document.getElementById("timer-badge");
+const timerTextEl = document.getElementById("timer-text");
+
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+}
+function updateTimerDisplay(){
+  timerTextEl.textContent = timeLeft;
+  timerBadgeEl.classList.remove("warn","danger","stopped");
+  if(timeLeft<=3 && timeLeft>0){ timerBadgeEl.classList.add("danger"); }
+  else if(timeLeft<=6){ timerBadgeEl.classList.add("warn"); }
+}
+function startTimer(){
+  stopTimer();
+  timeLeft = TIME_LIMIT;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft<=0){
+      timeLeft = 0;
+      updateTimerDisplay();
+      stopTimer();
+      handleTimeUp();
+    } else {
+      updateTimerDisplay();
+    }
+  },1000);
+}
+function freezeTimerDisplay(){
+  stopTimer();
+  timerBadgeEl.classList.add("stopped");
+}
+function handleTimeUp(){
+  if(answered[current]) return;
+  playTimeUpSound();
+  const q = activeQuestions[current];
+  const btns = optionsEl.querySelectorAll(".opt-btn");
+  btns.forEach(b=>b.classList.add("disabled"));
+  feedbackEl.textContent = "⏰ HẾT GIỜ!";
+  feedbackEl.className = "feedback wrong";
+  answered[current] = true;
+  revealAnswer(true);
+  timerBadgeEl.classList.add("stopped");
+
+  // Hết thời gian dù chưa chọn đáp án vẫn được sang câu tiếp theo.
+  nextBtn.disabled = false;
+  nextBtn.style.opacity = "";
+  nextBtn.style.cursor = "pointer";
+  nextBtn.textContent = (current === activeQuestions.length - 1)
+    ? "HOÀN THÀNH"
+    : "CÂU TIẾP THEO →";
+}
+
+const qnumEl = document.getElementById("qnum");
+const qtextEl = document.getElementById("qtext");
+const optionsEl = document.getElementById("options");
+const feedbackEl = document.getElementById("feedback");
+const answerBoxEl = document.getElementById("answer-box");
+const ansLetterEl = document.getElementById("ans-letter");
+const progressTextEl = document.getElementById("progress-text");
+const progressFillEl = document.getElementById("progress-fill");
+const scoreTextEl = document.getElementById("score-text");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+const quizCard = document.getElementById("quiz-card");
+const finishScreen = document.getElementById("finish-screen");
+const navRow = document.getElementById("nav-row");
+const progressWrap = document.getElementById("progress-wrap");
+
+function formatScore(count){
+  const score = count * 0.2;
+  return score.toFixed(2).replace(".", ",");
+}
+
+function renderSlide(){
+  const q = activeQuestions[current];
+  qnumEl.textContent = "CÂU " + String(current+1).padStart(2,"0") + (q.sourceLabel ? " (" + q.sourceLabel + ")" : "");
+  qtextEl.innerHTML = formatPhysicsText(q.q);
+  // Nhường khoảng trống đúng bằng chiều rộng nhãn câu ở dòng đầu; dòng tiếp theo không thụt vào.
+  qtextEl.style.textIndent = (qnumEl.offsetWidth + 18) + "px";
+  progressTextEl.textContent = "CÂU " + String(current+1).padStart(2,"0") + " / " + activeQuestions.length;
+  progressFillEl.style.width = ((current+1)/activeQuestions.length*100) + "%";
+  scoreTextEl.textContent = "Điểm: " + formatScore(correctCount);
+
+  optionsEl.innerHTML = "";
+  q.o.forEach((optText, idx)=>{
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.innerHTML = '<span class="badge">'+letters[idx]+'</span><span>'+formatAnswerOption(optText,q.o)+'</span>'; 
+    btn.onclick = ()=>selectAnswer(idx);
+    optionsEl.appendChild(btn);
+  });
+
+  feedbackEl.textContent = "";
+  feedbackEl.className = "feedback";
+  answerBoxEl.className = "answer-box";
+
+  if(answered[current]){
+    revealAnswer(true);
+    freezeTimerDisplay();
+  } else {
+    startTimer();
+  }
+
+  prevBtn.disabled = (current===0);
+  nextBtn.textContent = (current===activeQuestions.length-1) ? "HOÀN THÀNH" : "CÂU TIẾP THEO →";
+  nextBtn.disabled = !answered[current];
+  nextBtn.style.opacity = answered[current] ? "" : "0.45";
+  nextBtn.style.cursor = answered[current] ? "pointer" : "not-allowed";
+}
+
+function selectAnswer(idx){
+  if(answered[current]) return; // đã trả lời rồi, khóa không cho chọn lại
+  const q = activeQuestions[current];
+  const btns = optionsEl.querySelectorAll(".opt-btn");
+  answered[current] = true;
+  freezeTimerDisplay();
+  if(idx === q.a){
+    playCorrectSound();
+    btns[idx].classList.add("correct");
+    feedbackEl.textContent = "✓ CHÍNH XÁC!";
+    feedbackEl.className = "feedback correct";
+    correctCount++;
+    scoreTextEl.textContent = "Điểm: " + formatScore(correctCount);
+  } else {
+    playWrongSound();
+    btns[idx].classList.add("wrong");
+    feedbackEl.textContent = "✗ CHƯA ĐÚNG!";
+    feedbackEl.className = "feedback wrong";
+  }
+  btns.forEach(b=>b.classList.add("disabled"));
+  revealAnswer(false);
+  nextBtn.disabled = false;
+  nextBtn.style.opacity = "";
+  nextBtn.style.cursor = "pointer";
+}
+
+function revealAnswer(instant){
+  const q = activeQuestions[current];
+  ansLetterEl.textContent = letters[q.a];
+  answerBoxEl.classList.add("show");
+  const btns = optionsEl.querySelectorAll(".opt-btn");
+  btns[q.a].classList.add("correct");
+  btns.forEach(b=>b.classList.add("disabled"));
+}
+
+function nextSlide(){
+  // Nếu hết giờ mà học sinh chưa chọn đáp án, vẫn được sang câu tiếp theo.
+  if(!answered[current] && timeLeft > 0){
+    alert("Hãy chọn một đáp án trước khi sang câu tiếp theo.");
+    return;
+  }
+  if(current === activeQuestions.length-1){
+    showFinish();
+    return;
+  }
+  current++;
+  renderSlide();
+}
+
+function prevSlide(){
+  if(current===0) return;
+  current--;
+  renderSlide();
+}
+
+function showFinish(){
+  stopTimer();
+  quizCard.style.display = "none";
+  navRow.style.display = "none";
+  progressWrap.style.display = "none";
+  finishScreen.style.display = "block";
+  document.getElementById("final-score").textContent = "Điểm: " + formatScore(correctCount);
+}
+
+function restartQuiz(){
+  stopTimer();
+  activeQuestions = buildShuffledQuestions();
+  current = 0;
+  answered = new Array(activeQuestions.length).fill(false);
+  correctCount = 0;
+  quizCard.style.display = "block";
+  navRow.style.display = "grid";
+  progressWrap.style.display = "block";
+  finishScreen.style.display = "none";
+  renderSlide();
+}
+
+renderSlide();
+function fitQuizTitle(){
+  const el=document.querySelector('.quiz-title'); if(!el) return;
+  let size=22; el.style.fontSize=size+'px';
+  while(el.scrollWidth>el.clientWidth && size>12){ size-=0.5; el.style.fontSize=size+'px'; }
+}
+fitQuizTitle(); window.addEventListener('resize',fitQuizTitle);
+
+</script>
+</body>
+</html>
